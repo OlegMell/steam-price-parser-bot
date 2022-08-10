@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && nodemon dist/index"
+    "start": "nodemon --exec \"tsc && node dist/index\""
   },
   "author": "melnik oleh <oleg.mel123@gmail.com>",
   "license": "ISC",
