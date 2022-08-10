@@ -1,3 +1,3 @@
 # steam-price-parser-bot
 
-## npm run start - start app
+#### type in terminal **`npm run start`**  for start the app
