@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
+  "worker": "node src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec \"tsc && node dist/index\""
+  },
+  "engines": {
+    "node": "17.0",
+    "npm": "8.1"
   },
   "author": "melnik oleh <oleg.mel123@gmail.com>",
   "license": "ISC",
