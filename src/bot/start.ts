@@ -12,10 +12,7 @@ const { Stage } = Scenes;
 import express from 'express';
 
 
-
 export default async function startParseBot() {
-
-
 
     await startDBConnect();
 
@@ -40,6 +37,7 @@ export default async function startParseBot() {
     });
 // TELEGRAM WEBHOOK - https://core.telegram.org/bots/api#setwebhook
     app.post(`/${process.env.BOT_TOKEN}`, (req: Request, res: any) => {
+        res.json({ webhook: true });
         bot.processUpdate(req.body);
         res.status(200).json({ message: 'ok' });
     });
