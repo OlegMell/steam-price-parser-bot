@@ -25,7 +25,7 @@ export default async function startParseBot() {
 
     app.use(express.json());
 
-    const secretPath = `/telegraf/${bot.secretPathComponent()}`;
+    const secretPath = `telegraf/${bot.secretPathComponent()}`;
 
     app.get('/', (req: Request, res: any) => {
         console.log(req);
@@ -48,7 +48,7 @@ export default async function startParseBot() {
     bot.use(session());
     bot.use(stage.middleware());
 
-    bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
+    // bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
 
 
     bot.start(async (ctx: any) => {
