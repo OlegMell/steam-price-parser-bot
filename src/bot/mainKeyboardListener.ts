@@ -14,7 +14,8 @@ export const startMainKeyboardListener = (bot: any) => {
         });
 
         bot.hears('Инвентарь', (ctx: any) => {
-            ctx.reply('Инвентарь');
+            ctx.replyWithMarkdown('*Инвентарь*');
+            ctx.scene.enter('showStock');
         });
 
     }

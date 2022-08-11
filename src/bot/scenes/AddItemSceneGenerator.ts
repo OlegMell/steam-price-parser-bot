@@ -4,7 +4,7 @@ import { Update } from 'telegraf/typings/core/types/typegram';
 import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
 import { ItemModel, UserModel } from '../../db/db.config';
 
-export class SceneGenerator {
+export class AddItemSceneGenerator {
 
     #createdItemTempl: { name: string, link: string, initialPrice: number, selectorHTML: string } | undefined;
 
