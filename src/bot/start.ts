@@ -8,6 +8,7 @@ import { mainKeyboard } from './keyboard.js';
 import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
 import { setStageScenes } from './stage';
+import express from 'express';
 
 
 export default async function startParseBot() {
@@ -18,29 +19,34 @@ export default async function startParseBot() {
 
     bot = new Telegraf(process.env.BOT_TOKEN || '')
 
-    // const app = express();
+    const app = express();
 
-    // const port = process.env.PORT || 5000;
+    const port = process.env.PORT || 5000;
     //
-    // app.use(express.json());
+    app.use(express.json());
 
-    // const secretPath = `telegraf/${ bot.secretPathComponent() }`;
+    const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
 
-    // app.get('/', (req: Request, res: any) => {
-    //     console.log(req);
-    //     res.status(200).json({ message: 'Hello from the Bot API.' });
-    // });
+
 
     if (process.env.NODE_ENV === 'production') {
         console.log('here');
-        // await bot.telegram.setWebhook(process.env.HEROKU_URL! + secretPath);
 
-        // app.use(bot.webhookCallback(secretPath));
+        bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
+
+        app.get('/', (req: Request, res: any) => {
+            console.log(req);
+            res.status(200).json({ message: 'Hello from the Bot API.' });
+        });
+
+        app.use(bot.webhookCallback(secretPath));
     }
 
-    // app.listen(port, () => {
-    //     console.log(`\n\nServer running on port ${ port }.\n\n`);
-    // });
+
+
+    app.listen(port, () => {
+        console.log(`\n\nServer running on port ${ port }.\n\n`);
+    });
 
     const stage = setStageScenes();
 
@@ -70,16 +76,11 @@ export default async function startParseBot() {
     startMainKeyboardListener(bot);
 
     // bot.startWebhook
-    bot.launch({
-        webhook: {
-            domain: process.env.HEROKU_URL,
-            port: 4000
-        }
-    });
+    // await bot.launch();
     // if (process.env.NODE_ENV !== 'production')
 
     // Enable graceful stop
-    process.once('SIGINT', () => bot.stop('SIGINT'));
-    process.once('SIGTERM', () => bot.stop('SIGTERM'));
+    // process.once('SIGINT', () => bot.stop('SIGINT'));
+    // process.once('SIGTERM', () => bot.stop('SIGTERM'));
 }
 
