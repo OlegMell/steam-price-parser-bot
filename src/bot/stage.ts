@@ -1,7 +1,8 @@
 import { AddItemSceneGenerator } from './scenes/AddItemSceneGenerator';
 import { StockSceneGenerator } from './scenes/StockSceneGenerator';
 import { Scenes } from 'telegraf';
-import { Stage } from 'telegraf/typings/scenes';
+
+const { Stage } = Scenes;
 
 export const setStageScenes = () => {
 
