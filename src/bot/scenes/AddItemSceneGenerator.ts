@@ -9,7 +9,7 @@ export class AddItemSceneGenerator {
     #createdItemTempl: { name: string, link: string, initialPrice: number, selectorHTML: string } | undefined;
 
     addItemNameScene() {
-        const addItemName = new Scenes.BaseScene('addItemName');
+        const addItemName = new Scenes.BaseScene<Scenes.SceneContext>('addItemName');
 
         addItemName.enter(async (ctx: Context<Update>) => {
 
@@ -30,7 +30,7 @@ export class AddItemSceneGenerator {
 
     addItemLinkScene() {
 
-        const addItem = new Scenes.BaseScene('addItem');
+        const addItem = new Scenes.BaseScene<Scenes.SceneContext>('addItem');
 
         addItem.enter(async (ctx: any) => {
 
@@ -55,7 +55,7 @@ export class AddItemSceneGenerator {
     }
 
     addItemPriceScene() {
-        const addItemPrice = new Scenes.BaseScene('addItemPrice');
+        const addItemPrice = new Scenes.BaseScene<Scenes.SceneContext>('addItemPrice');
 
         addItemPrice.enter(async (ctx: any) => {
             await ctx.reply('Введите начальную цену: ');
@@ -79,7 +79,7 @@ export class AddItemSceneGenerator {
 
     addItemSelectorScene() {
 
-        const addItemSelector = new Scenes.BaseScene('addItemSelector');
+        const addItemSelector = new Scenes.BaseScene<Scenes.SceneContext>('addItemSelector');
 
         addItemSelector.enter(async (ctx: any) => {
             await ctx.reply('Введите CSS селектор товара для поиска: ');
@@ -100,7 +100,7 @@ export class AddItemSceneGenerator {
 
     addItemConfirmScene() {
 
-        const addItemConfirm = new Scenes.BaseScene('addItemConfirm');
+        const addItemConfirm = new Scenes.BaseScene<Scenes.SceneContext>('addItemConfirm');
 
         addItemConfirm.enter(async (ctx: any) => {
             await ctx.replyWithMarkdown('*Сохранить товар?*', addItemConfirmKeyboard);

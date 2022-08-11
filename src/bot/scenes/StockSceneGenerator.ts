@@ -5,7 +5,7 @@ import { UserModel } from '../../db/db.config';
 export class StockSceneGenerator {
 
     showStockScene() {
-        const showStock = new Scenes.BaseScene('showStock');
+        const showStock = new Scenes.BaseScene<Scenes.SceneContext>('showStock');
 
         showStock.enter(async (ctx: any) => {
             const userItems = await UserModel.findOne({ chatId: ctx.chat.id })

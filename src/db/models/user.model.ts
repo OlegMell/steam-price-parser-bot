@@ -1,18 +1,17 @@
-import {UserModel} from "../db.config.js";
-import {helpers} from "../../helpers/helpers.js";
+import { UserModel } from "../db.config.js";
+import { helpers } from "../../helpers/helpers.js";
 
 
 export const User = {
 
-    findOneBy: async (by: any) => {
+    findOneBy: async (by: { [key: string]: string | number }) => {
         return UserModel.findOne(by);
     },
 
     create: async (chatUser: any) => {
 
-       return UserModel.create({
+        return UserModel.create({
             name: helpers.getNameFromChat(chatUser),
-            password: '',
             chatId: chatUser.chat.id,
             items: [],
             crypts: []

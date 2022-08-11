@@ -17,14 +17,9 @@ export default async function startParseBot() {
 
     await startDBConnect();
 
-    let bot: any;
+    let bot: Telegraf<Scenes.SceneContext>;
 
-    if (process.env.NODE_ENV === 'production') {
-        bot = new Telegraf(process.env.BOT_TOKEN || '')
-        bot.webhookCallback(process.env.HEROKU_URL! + process.env.BOT_TOKEN!);
-    } else {
-        bot = new Telegraf(process.env.BOT_TOKEN || '');
-    }
+    bot = new Telegraf(process.env.BOT_TOKEN || '')
 
     const app = express();
 
@@ -32,15 +27,23 @@ export default async function startParseBot() {
 
     app.use(express.json());
 
+    const secretPath = `/telegraf/${bot.secretPathComponent()}`;
+
     app.get('/', (req: Request, res: any) => {
         console.log(req);
         res.status(200).json({ message: 'Hello from the Bot API.' });
     });
 // TELEGRAM WEBHOOK - https://core.telegram.org/bots/api#setwebhook
-    app.post(`/${ process.env.BOT_TOKEN }`, (req: Request, res: any) => {
-        bot.processUpdate(req.body);
-        res.status(200).json({ message: 'ok' });
-    });
+//     app.post(`/${ process.env.BOT_TOKEN }`, (req: Request, res: any) => {
+//         bot.processUpdate(req.body);
+//         res.status(200).json({ message: 'ok' });
+//     });
+
+    if (process.env.NODE_ENV === 'production') {
+        await bot.telegram.setWebhook(process.env.HEROKU_URL! + secretPath);
+    }
+
+    app.use(bot.webhookCallback(secretPath));
 
     app.listen(port, () => {
         console.log(`\n\nServer running on port ${ port }.\n\n`);
@@ -57,24 +60,18 @@ export default async function startParseBot() {
 
     const stockScene = stockSceneGenerator.showStockScene();
 
-    // @ts-ignore
-    const stage = new Stage([
-        // @ts-ignore
+
+    const stage = new Stage<Scenes.SceneContext>([
         addItemNameScene,
-        // @ts-ignore
         addItemLinkScene,
-        // @ts-ignore
         addItemPriceScene,
-        // @ts-ignore
         addItemSelectorScene,
-        // @ts-ignore
         addItemConfirmScene,
-        // @ts-ignore
+
         stockScene,
     ]);
 
     bot.use(session());
-    // @ts-ignore
     bot.use(stage.middleware());
 
     bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
@@ -100,5 +97,9 @@ export default async function startParseBot() {
     startMainKeyboardListener(bot);
 
     bot.launch();
+
+    // Enable graceful stop
+    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGTERM', () => bot.stop('SIGTERM'));
 }
 

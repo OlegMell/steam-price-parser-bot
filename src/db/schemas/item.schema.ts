@@ -1,7 +1,10 @@
-const mongoose = require('mongoose');
-const {Schema} = mongoose;
+import mongoose from 'mongoose';
 
-const ItemSchema = new Schema({
+import { Item } from '../interfaces/item.interface';
+
+const { Schema } = mongoose;
+
+const ItemSchema = new Schema<Item>({
     name: String,
     link: String,
     prevPrice: String,
