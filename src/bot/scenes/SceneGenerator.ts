@@ -131,8 +131,8 @@ export class SceneGenerator {
 
         addItemConfirm.hears('Нет', async (ctx: any) => {
             this.#createdItemTempl = undefined;
-            await ctx.replyWithMarkdown('*Добавление товара отмененно*');
-            addItemConfirm.leave();
+            await ctx.replyWithMarkdown('*Добавление товара отмененно*', mainKeyboard);
+            await addItemConfirm.leave();
         });
 
 
