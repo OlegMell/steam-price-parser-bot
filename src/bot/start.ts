@@ -1,5 +1,4 @@
 import { Telegraf, Scenes, session } from 'telegraf';
-import express from 'express';
 
 import startDBConnect from '../db/db.connect.js';
 
