@@ -2,7 +2,7 @@ import { Context, Scenes } from 'telegraf';
 import { helpers } from '../../helpers/helpers';
 import { Update } from 'telegraf/typings/core/types/typegram';
 import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
-import { ItemModel } from '../../db/db.config';
+import { ItemModel, UserModel } from '../../db/db.config';
 
 export class SceneGenerator {
 
@@ -18,14 +18,10 @@ export class SceneGenerator {
             // await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА*');
 
             await ctx.reply('Введите название товара');
-
-            // this.#createdItemTempl = await ItemModel.create({});
-
         });
 
         addItemName.on('text', async (ctx: any) => {
             this.#createdItemTempl!.name = ctx.message.text;
-            // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { name } });
             await ctx.scene.enter('addItem');
         });
 
@@ -51,7 +47,6 @@ export class SceneGenerator {
                 await ctx.scene.reenter();
             } else {
                 this.#createdItemTempl!.link = link;
-                // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { link } });
                 await ctx.scene.enter('addItemPrice');
             }
         });
@@ -74,7 +69,6 @@ export class SceneGenerator {
                 await ctx.scene.reenter();
             } else {
                 this.#createdItemTempl!.initialPrice = initialPrice;
-                // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { initialPrice } });
                 await ctx.scene.enter('addItemSelector');
             }
 
@@ -95,9 +89,6 @@ export class SceneGenerator {
 
             this.#createdItemTempl!.selectorHTML = ctx.message.text;
 
-            // const createdItem: any = await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id },
-            //     { $set: { selectorHTML } });
-
             await ctx.replyWithMarkdown('*ВЫ ДОБАВЛЯЕТЕ:*');
             await ctx.reply(`${ this.#createdItemTempl!.name }\n${ this.#createdItemTempl!.link }\n${ this.#createdItemTempl!.initialPrice }\n${ this.#createdItemTempl!.selectorHTML }`)
 
@@ -117,9 +108,27 @@ export class SceneGenerator {
 
         addItemConfirm.hears('Да', async (ctx: any) => {
 
-            await ItemModel.create(this.#createdItemTempl)
-                .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
-                .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
+            // await ItemModel.create(this.#createdItemTempl)
+            //     .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
+            //     .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
+
+            const newItem = await ItemModel.create(this.#createdItemTempl);
+
+            const user = await UserModel.findOne({ chatId: ctx.chat.id });
+
+            if (user) {
+                await UserModel.updateOne({
+                    chatId: ctx.chat.id
+                }, {
+                    $addToSet: {
+                        items: [
+                            newItem
+                        ]
+                    }
+                })
+                    .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
+                    .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
+            }
 
             addItemConfirm.leave();
         });
