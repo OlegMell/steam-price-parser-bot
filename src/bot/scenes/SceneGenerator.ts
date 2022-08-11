@@ -1,7 +1,7 @@
 import { Context, Scenes } from 'telegraf';
 import { helpers } from '../../helpers/helpers';
 import { Update } from 'telegraf/typings/core/types/typegram';
-import { addItemConfirmKeyboard } from '../keyboard';
+import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
 import { ItemModel } from '../../db/db.config';
 
 export class SceneGenerator {
@@ -15,7 +15,7 @@ export class SceneGenerator {
 
             this.#createdItemTempl = {} as { name: string, link: string, initialPrice: number, selectorHTML: string };
 
-            await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА*');
+            // await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА*');
 
             await ctx.reply('Введите название товара');
 
@@ -117,9 +117,9 @@ export class SceneGenerator {
 
         addItemConfirm.hears('Да', async (ctx: any) => {
 
-            ItemModel.create(this.#createdItemTempl)
-                .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*'))
-                .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *'));
+            await ItemModel.create(this.#createdItemTempl)
+                .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
+                .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
 
             addItemConfirm.leave();
         });
