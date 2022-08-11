@@ -14,7 +14,14 @@ export default async function startParseBot() {
 
     await startDBConnect();
 
-    const bot = new Telegraf(process.env.BOT_TOKEN || '');
+    let bot;
+
+    if (process.env.NODE_ENV === 'production') {
+        bot = new Telegraf(process.env.BOT_TOKEN || '')
+        bot.webhookCallback(process.env.HEROKU_URL! + process.env.BOT_TOKEN!);
+    } else {
+        bot = new Telegraf(process.env.BOT_TOKEN || '');
+    }
 
     const sceneGenerator = new SceneGenerator();
 
@@ -30,6 +37,8 @@ export default async function startParseBot() {
     bot.use(session());
     // @ts-ignore
     bot.use(stage.middleware());
+
+    bot.webhookCallback(`${process.env.HEROKU_URL}${process.env.BOT_TOKEN}`);
 
 
     bot.start(async (ctx: any) => {

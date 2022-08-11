@@ -108,10 +108,6 @@ export class SceneGenerator {
 
         addItemConfirm.hears('Да', async (ctx: any) => {
 
-            // await ItemModel.create(this.#createdItemTempl)
-            //     .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
-            //     .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
-
             const newItem = await ItemModel.create(this.#createdItemTempl);
 
             const user = await UserModel.findOne({ chatId: ctx.chat.id });
