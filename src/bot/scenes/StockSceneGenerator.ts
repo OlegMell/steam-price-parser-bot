@@ -81,6 +81,11 @@ export class StockSceneGenerator {
         });
 
         showStock.hears('Назад', async (ctx: any) => {
+
+            for (const item of this.#msgs) {
+                await ctx.telegram.deleteMessage(ctx.chat.id, item.msgId);
+            }
+
             await ctx.scene.leave();
             await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
         });
