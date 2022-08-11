@@ -22,9 +22,10 @@ export default async function startParseBot() {
     const addItemLinkScene = sceneGenerator.addItemLinkScene();
     const addItemPriceScene = sceneGenerator.addItemPriceScene();
     const addItemSelectorScene = sceneGenerator.addItemSelectorScene();
+    const addItemConfirmScene = sceneGenerator.addItemConfirmScene();
 
     // @ts-ignore
-    const stage = new Stage([addItemNameScene, addItemLinkScene, addItemPriceScene, addItemSelectorScene ]);
+    const stage = new Stage([addItemNameScene, addItemLinkScene, addItemPriceScene, addItemSelectorScene, addItemConfirmScene ]);
 
     bot.use(session());
     // @ts-ignore
