@@ -70,7 +70,8 @@ export default async function startParseBot() {
 
     startMainKeyboardListener(bot);
 
-    bot.launch();
+    if (process.env.NODE_ENV !== 'production')
+        await bot.launch();
 
     // Enable graceful stop
     process.once('SIGINT', () => bot.stop('SIGINT'));
