@@ -1,8 +1,7 @@
 export const startMainKeyboardListener = (bot: any) => {
 
         bot.hears('Добавить товар', async (ctx: any) => {
-            await ctx.reply('Добавить товар');
-            await ctx.scene.enter('addItem');
+            await ctx.scene.enter('addItemName');
         });
 
         bot.hears('Удалить товар', (ctx: any) => {

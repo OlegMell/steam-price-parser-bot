@@ -1,10 +1,10 @@
-import {Telegraf, Scenes, session} from 'telegraf';
+import { Telegraf, Scenes, session } from 'telegraf';
 import startDBConnect from '../db/db.connect.js';
 
 import { SceneGenerator } from './scenes/SceneGenerator.js';
 import { User } from '../db/models/user.model.js';
 import { MESSAGES } from './messages.js';
-import mainKeyboard from './keyboard.js';
+import { mainKeyboard } from './keyboard.js';
 import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
 const { Stage } = Scenes;
@@ -18,12 +18,13 @@ export default async function startParseBot() {
 
     const sceneGenerator = new SceneGenerator();
 
+    const addItemNameScene = sceneGenerator.addItemNameScene();
     const addItemLinkScene = sceneGenerator.addItemLinkScene();
     const addItemPriceScene = sceneGenerator.addItemPriceScene();
     const addItemSelectorScene = sceneGenerator.addItemSelectorScene();
 
     // @ts-ignore
-    const stage = new Stage([addItemLinkScene, addItemPriceScene, addItemSelectorScene]);
+    const stage = new Stage([addItemNameScene, addItemLinkScene, addItemPriceScene, addItemSelectorScene ]);
 
     bot.use(session());
     // @ts-ignore
@@ -32,7 +33,11 @@ export default async function startParseBot() {
 
     bot.start(async (ctx: any) => {
 
-        const user = await User.findOneBy({chatId: ctx.chat.id});
+        const user = await User.findOneBy({ chatId: ctx.chat.id });
+
+        // console.log(user);
+
+        // console.log(mainKeyboard);
 
         if (!user) {
 
@@ -40,10 +45,10 @@ export default async function startParseBot() {
 
             console.log('CREATED_USER', u);
 
-            ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
+            await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
 
         } else {
-            ctx.reply('Hi there!', mainKeyboard);
+            await ctx.reply('Hi there!', mainKeyboard);
         }
 
 
