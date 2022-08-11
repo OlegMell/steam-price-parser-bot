@@ -13,6 +13,8 @@ export class SceneGenerator {
 
         addItemName.enter(async (ctx: Context<Update>) => {
 
+            this.#createdItemTempl = {} as { name: string, link: string, initialPrice: number, selectorHTML: string };
+
             await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА*');
 
             await ctx.reply('Введите название товара');
@@ -22,7 +24,7 @@ export class SceneGenerator {
         });
 
         addItemName.on('text', async (ctx: any) => {
-            this.#createdItemTempl.name = ctx.message.text;
+            this.#createdItemTempl!.name = ctx.message.text;
             // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { name } });
             await ctx.scene.enter('addItem');
         });
@@ -48,7 +50,7 @@ export class SceneGenerator {
                 await ctx.reply('Вы ввели не действительную ссылку!');
                 await ctx.scene.reenter();
             } else {
-                this.#createdItemTempl.link = link;
+                this.#createdItemTempl!.link = link;
                 // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { link } });
                 await ctx.scene.enter('addItemPrice');
             }
@@ -71,7 +73,7 @@ export class SceneGenerator {
             if (!initialPrice || isNaN(initialPrice)) {
                 await ctx.scene.reenter();
             } else {
-                this.#createdItemTempl.initialPrice = initialPrice;
+                this.#createdItemTempl!.initialPrice = initialPrice;
                 // await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id }, { $set: { initialPrice } });
                 await ctx.scene.enter('addItemSelector');
             }
@@ -91,13 +93,13 @@ export class SceneGenerator {
 
         addItemSelector.on('text', async (ctx: any) => {
 
-            this.#createdItemTempl.selectorHTML = ctx.message.text;
+            this.#createdItemTempl!.selectorHTML = ctx.message.text;
 
             // const createdItem: any = await ItemModel.findOneAndUpdate({ id: this.#createdItemTempl._id },
             //     { $set: { selectorHTML } });
 
             await ctx.replyWithMarkdown('*ВЫ ДОБАВЛЯЕТЕ:*');
-            await ctx.reply(`${ this.#createdItemTempl.name }\n${ this.#createdItemTempl.link }\n${ this.#createdItemTempl.initialPrice }\n${ this.#createdItemTempl.selectorHTML }`)
+            await ctx.reply(`${ this.#createdItemTempl!.name }\n${ this.#createdItemTempl!.link }\n${ this.#createdItemTempl!.initialPrice }\n${ this.#createdItemTempl!.selectorHTML }`)
 
             await ctx.scene.enter('addItemConfirm');
         });
