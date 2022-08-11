@@ -40,10 +40,11 @@ export default async function startParseBot() {
 //     });
 
     if (process.env.NODE_ENV === 'production') {
+        console.log('here');
         await bot.telegram.setWebhook(process.env.HEROKU_URL! + secretPath);
-    }
 
-    app.use(bot.webhookCallback(secretPath));
+        app.use(bot.webhookCallback(secretPath));
+    }
 
     app.listen(port, () => {
         console.log(`\n\nServer running on port ${ port }.\n\n`);

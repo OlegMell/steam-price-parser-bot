@@ -1,4 +1,5 @@
-export interface Item {
+export interface Item extends Document {
+    id?: string,
     name: string,
     link: string,
     prevPrice: string,
