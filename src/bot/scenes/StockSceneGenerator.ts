@@ -86,8 +86,8 @@ export class StockSceneGenerator {
                 await ctx.telegram.deleteMessage(ctx.chat.id, item.msgId);
             }
 
-            await ctx.scene.leave();
             await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
+            await ctx.scene.leave();
         });
 
 
