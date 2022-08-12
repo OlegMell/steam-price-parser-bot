@@ -23,7 +23,7 @@ export default async function startParseBot() {
 
     const port = process.env.PORT || 5000;
     //
-    app.use(express.json());
+    // app.use(express.json());
 
     const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
 
@@ -32,6 +32,7 @@ export default async function startParseBot() {
     if (process.env.NODE_ENV === 'production') {
         console.log('here');
 
+        app.use(bot.webhookCallback(secretPath));
         bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
 
         app.get('/', (req: Request, res: any) => {
@@ -39,7 +40,6 @@ export default async function startParseBot() {
             res.status(200).json({ message: 'Hello from the Bot API.' });
         });
 
-        app.use(bot.webhookCallback(secretPath));
     }
 
 
