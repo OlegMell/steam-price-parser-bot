@@ -9,14 +9,14 @@ export const startMainKeyboardListener = (bot: any) => {
             await ctx.scene.enter('addItemName');
         });
 
-        bot.hears('Удалить товар', (ctx: any) => {
-            ctx.replyWithMarkdown('*УДАЛЕНИЕ ТОВАРА*');
-            ctx.scene.enter('deleteItem');
+        bot.hears('Удалить товар', async (ctx: any) => {
+            await ctx.replyWithMarkdown('*УДАЛЕНИЕ ТОВАРА*');
+            await ctx.scene.enter('deleteItem');
         });
 
-        bot.hears('Инвентарь', (ctx: any) => {
-            ctx.replyWithMarkdown('*Инвентарь*');
-            ctx.scene.enter('showStock');
+        bot.hears('Инвентарь', async (ctx: any) => {
+            await ctx.replyWithMarkdown('*ИНВЕНТАРЬ*');
+            await ctx.scene.enter('showStock');
         });
 
     }
