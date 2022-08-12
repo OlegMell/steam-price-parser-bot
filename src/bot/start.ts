@@ -1,44 +1,46 @@
-import { Telegraf, Scenes, session } from 'telegraf';
+import { Telegraf, Scenes } from 'telegraf';
 
-import startDBConnect from '../db/db.connect.js';
+// import startDBConnect from '../db/db.connect.js';
 
-import { User } from '../db/models/user.model.js';
-import { MESSAGES } from './messages.js';
-import { mainKeyboard } from './keyboard.js';
-import { startMainKeyboardListener } from './mainKeyboardListener.js';
+// import { User } from '../db/models/user.model.js';
+// import { MESSAGES } from './messages.js';
+// import { mainKeyboard } from './keyboard.js';
+// import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
-import { setStageScenes } from './stage';
-import express from 'express';
+// import { setStageScenes } from './stage';
+// import express from 'express';
 
 
-export default async function startParseBot() {
+export default function startParseBot() {
 
-    await startDBConnect();
+    // await startDBConnect();
 
     let bot: Telegraf<Scenes.SceneContext>;
 
     bot = new Telegraf(process.env.BOT_TOKEN || '')
 
-    const app = express();
+    console.log(bot);
 
-    const port = process.env.PORT || 5000;
+    // const app = express();
+
+    // const port = process.env.PORT || 5000;
     //
-    app.use(express.json());
+    // app.use(express.json());
 
-    const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
+    // const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
     // const secretPath = `/telegraf`;
 
 
 
-    if (process.env.NODE_ENV === 'production') {
-        console.log('here');
-
-        // app.use(bot.webhookCallback(secretPath));
-        // bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
-        // bot.telegram.setWebhook(`${secretPath}`);
-
-
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //     console.log('here');
+    //
+    //     // app.use(bot.webhookCallback(secretPath));
+    //     // bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
+    //     // bot.telegram.setWebhook(`${secretPath}`);
+    //
+    //
+    // }
 
         // app.get('/', (req: Request, res: any) => {
         //     console.log(req);
@@ -112,56 +114,59 @@ export default async function startParseBot() {
     //     console.log(`\n\nServer running on port ${ port }.\n\n`);
     // });
 
-    const stage = setStageScenes();
-
-    bot.use(session());
-    bot.use(stage.middleware());
-
-    // bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
-
-
-    bot.start(async (ctx: any) => {
-
-        console.log(ctx);
-
-        const user = await User.findOneBy({ chatId: ctx.chat.id });
-
-        if (!user) {
-
-            await User.create(ctx);
-
-            await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
-
-        } else {
-            await ctx.reply('Hi there!', mainKeyboard);
-        }
-
-
-    });
-
-    startMainKeyboardListener(bot);
+    // const stage = setStageScenes();
+    //
+    // bot.use(session());
+    // bot.use(stage.middleware());
+    //
+    // // bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
+    //
+    //
+    // bot.start(async (ctx: any) => {
+    //
+    //     console.log(ctx);
+    //
+    //     const user = await User.findOneBy({ chatId: ctx.chat.id });
+    //
+    //     if (!user) {
+    //
+    //         await User.create(ctx);
+    //
+    //         await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
+    //
+    //     } else {
+    //         await ctx.reply('Hi there!', mainKeyboard);
+    //     }
+    //
+    //
+    // });
+    //
+    // startMainKeyboardListener(bot);
 
     // bot.startWebhook
     // await bot.launch();
     // if (process.env.NODE_ENV !== 'production')
 
-    bot.telegram.setWebhook(process.env.HEROKU_URL+secretPath);
+    // bot.telegram.setWebhook(process.env.HEROKU_URL+secretPath);
 
     // @ts-ignore
-    app.get('/', (req, res) => res.send('Hello World!'))
+    // app.get('/', (req, res) => res.send('Hello World!'))
 
-    app.post(secretPath, (req, res) => {
-        console.log(req.body)
-        return bot.handleUpdate(req.body, res)
-    })
+    // app.post(secretPath, (req, res) => {
+    //     console.log(req.body)
+    //     return bot.handleUpdate(req.body, res)
+    // })
+    //
+    // app.use(bot.webhookCallback(secretPath))
+    //
+    // app.listen(port, () => {
+    //     console.log(`Example app listening on port ${port}!`)
+    // })
 
-    app.use(bot.webhookCallback(secretPath))
+    bot.on("text", (ctx) => ctx.replyWithHTML("<b>Hello</b>"));
 
-    app.listen(port, () => {
-        console.log(`Example app listening on port ${port}!`)
-    })
+    return bot;
 
-    // await bot.launch();
 
     // Enable graceful stop
     // process.once('SIGINT', () => bot.stop('SIGINT'));

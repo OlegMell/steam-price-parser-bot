@@ -1,16 +1,28 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 import startParseBot from './bot/start.js';
+// import { Telegraf } from 'telegraf';
 
-(async () => await startParseBot())()
-    .then(() => {
-        console.log('App started');
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+// (async () => await startParseBot())()
+//     .then((r) => {
+//         console.log(r);
+//         console.log('App started');
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     });
+
+const bot = startParseBot();
+
+const port = +process.env.PORT!;
+
+bot.launch({
+    webhook: {
+        domain: process.env.HEROKU_URL,
+        port: port || 3000
+    }
+});
 
 
 // console.log($);
@@ -27,3 +39,21 @@ import startParseBot from './bot/start.js';
 //         console.log(err);
 //         //handle error
 //     });
+
+
+// let bot = new Telegraf(process.env.BOT_TOKEN || '')
+//
+// console.log(bot);
+//
+// bot.on("text", (ctx) => ctx.replyWithHTML("<b>Hello</b>"));
+//
+// bot.launch({
+//     webhook: {
+//         domain: "https://nasty-pillows-check-93-76-59-54.loca.lt",
+//         port: 4000,
+//     },
+// });
+//
+// // Enable graceful stop
+// process.once('SIGINT', () => bot.stop('SIGINT'));
+// process.once('SIGTERM', () => bot.stop('SIGTERM'));
