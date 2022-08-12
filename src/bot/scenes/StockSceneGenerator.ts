@@ -61,6 +61,17 @@ export class StockSceneGenerator {
 
         });
 
+        showStock.hears('Назад', async (ctx: any) => {
+
+            for (const item of this.#msgs) {
+                await ctx.telegram.deleteMessage(ctx.chat.id, item.msgId);
+            }
+
+            this.#userItems = [];
+            await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
+            await ctx.scene.leave();
+        });
+
         showStock.on('callback_query', async (ctx: any) => {
             const action = ctx.update.callback_query.data;
 
@@ -80,15 +91,7 @@ export class StockSceneGenerator {
 
         });
 
-        showStock.hears('Назад', async (ctx: any) => {
 
-            for (const item of this.#msgs) {
-                await ctx.telegram.deleteMessage(ctx.chat.id, item.msgId);
-            }
-
-            await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
-            await ctx.scene.leave();
-        });
 
 
         return showStock;
