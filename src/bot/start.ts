@@ -40,6 +40,37 @@ export default async function startParseBot() {
             res.status(200).json({ message: 'Hello from the Bot API.' });
         });
 
+        app.post(`${secretPath}`, (req, res) => {
+            const update = req.body
+
+            console.log(update);
+
+            /* Promise successful response:
+            >  {
+            >    message_id: 47,
+            >    from: {
+            >      id: 88,
+            >      is_bot: true,
+            >      first_name: 'what a day!',
+            >      username: 'what_a_day_bot'
+            >    },
+            >    chat: {
+            >      id: 255257629,
+            >      first_name: 'yeah boi',
+            >      username: 'yeah boi',
+            >      type: 'private'
+            >    },
+            >    date: 1603721253,
+            >    text: 'sup, gigga',
+            >    entities: [ { offset: 0, length: 10, type: 'bold' } ]
+            >  }
+            */
+            bot.handleUpdate(update)
+                .finally(() => {
+                    res.send('success')
+                })
+        })
+
     }
 
 
