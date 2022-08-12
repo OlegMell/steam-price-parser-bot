@@ -25,60 +25,92 @@ export default async function startParseBot() {
     //
     app.use(express.json());
 
-    // const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
-    const secretPath = `/telegraf`;
+    const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
+    // const secretPath = `/telegraf`;
 
 
 
     if (process.env.NODE_ENV === 'production') {
         console.log('here');
 
-        app.use(bot.webhookCallback(secretPath));
-        bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
+        // app.use(bot.webhookCallback(secretPath));
+        // bot.telegram.setWebhook(`${process.env.HEROKU_URL}${secretPath}`);
+        // bot.telegram.setWebhook(`${secretPath}`);
 
-        app.get('/', (req: Request, res: any) => {
-            console.log(req);
-            res.status(200).json({ message: 'Hello from the Bot API.' });
-        });
-
-        app.post(`${secretPath}`, (req, res) => {
-            const update = req.body
-
-            console.log(update);
-
-            /* Promise successful response:
-            >  {
-            >    message_id: 47,
-            >    from: {
-            >      id: 88,
-            >      is_bot: true,
-            >      first_name: 'what a day!',
-            >      username: 'what_a_day_bot'
-            >    },
-            >    chat: {
-            >      id: 255257629,
-            >      first_name: 'yeah boi',
-            >      username: 'yeah boi',
-            >      type: 'private'
-            >    },
-            >    date: 1603721253,
-            >    text: 'sup, gigga',
-            >    entities: [ { offset: 0, length: 10, type: 'bold' } ]
-            >  }
-            */
-            bot.handleUpdate(update)
-                .finally(() => {
-                    res.send(update);
-                })
-        })
 
     }
 
+        // app.get('/', (req: Request, res: any) => {
+        //     console.log(req);
+        //     res.status(200).json({ message: 'Hello from the Bot API.' });
+        // });
+        //
+        // app.post(`${secretPath}`, (req, res) => {
+        //     const update = req.body
+        //
+        //     console.log(update);
+        //
+        //     /* Promise successful response:
+        //     >  {
+        //     >    message_id: 47,
+        //     >    from: {
+        //     >      id: 88,
+        //     >      is_bot: true,
+        //     >      first_name: 'what a day!',
+        //     >      username: 'what_a_day_bot'
+        //     >    },
+        //     >    chat: {
+        //     >      id: 255257629,
+        //     >      first_name: 'yeah boi',
+        //     >      username: 'yeah boi',
+        //     >      type: 'private'
+        //     >    },
+        //     >    date: 1603721253,
+        //     >    text: 'sup, gigga',
+        //     >    entities: [ { offset: 0, length: 10, type: 'bold' } ]
+        //     >  }
+        //     */
+        //     bot.handleUpdate(update)
+        //         .finally(() => {
+        //             res.send(update);
+        //         })
+        // })
 
-
-    app.listen(port, () => {
-        console.log(`\n\nServer running on port ${ port }.\n\n`);
-    });
+    //     app.post('/setWebhook', (req, res) => {
+    //         // @ts-ignore
+    //         let base, whPath, whURL, isProd
+    //         const params = req?.body
+    //
+    //         console.log(params);
+    //
+    //         // if (!params) {
+    //         //     res.error()
+    //         // }
+    //
+    //         // local whURL should be like: 'https://terrible-goat-29.loca.lt/prj-name/us-central1/bot/hello'
+    //         // remote whURL should be like: 'https://us-central1-zxsvm-chufar.cloudfunctions.net/bot/hello'
+    //
+    //         isProd = process.env.NODE_ENV;
+    //
+    //         // base = req?.body?.base || BASE_URL // https://terrible-goat-29.loca.lt
+    //         // whPath = req?.body?.path || WEBHOOK_PATH // hello
+    //
+    //         whURL = `https://floppy-grapes-send-93-76-59-54.loca.lt${secretPath}`
+    //
+    //         bot.telegram.setWebhook(whURL)
+    //             .then(() => {
+    //                 // @ts-ignore
+    //                 res.send({ whURL })
+    //             })
+    //     })
+    //
+    // }
+    //
+    //
+    //
+    // app.listen(port, () => {
+    //     console.log(`\n\nServer running on port ${ port }.\n\n`);
+    // });
 
     const stage = setStageScenes();
 
@@ -89,6 +121,8 @@ export default async function startParseBot() {
 
 
     bot.start(async (ctx: any) => {
+
+        console.log(ctx);
 
         const user = await User.findOneBy({ chatId: ctx.chat.id });
 
@@ -110,6 +144,24 @@ export default async function startParseBot() {
     // bot.startWebhook
     // await bot.launch();
     // if (process.env.NODE_ENV !== 'production')
+
+    bot.telegram.setWebhook(process.env.HEROKU_URL+secretPath);
+
+    // @ts-ignore
+    app.get('/', (req, res) => res.send('Hello World!'))
+
+    app.post(secretPath, (req, res) => {
+        console.log(req.body)
+        return bot.handleUpdate(req.body, res)
+    })
+
+    app.use(bot.webhookCallback(secretPath))
+
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}!`)
+    })
+
+    // await bot.launch();
 
     // Enable graceful stop
     // process.once('SIGINT', () => bot.stop('SIGINT'));
