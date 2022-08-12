@@ -1,7 +1,7 @@
-import { ItemModel } from 'src/db/db.config';
-import { Item } from 'src/db/interfaces/item.interface';
+import { ItemModel } from '../../db/db.config';
 import { Markup, Scenes } from 'telegraf';
 import { mainKeyboard } from '../keyboard';
+import { Item } from '../../db/interfaces/item.interface';
 
 export class DeleteItemSceneGenerator {
 
