@@ -10,7 +10,8 @@ export const startMainKeyboardListener = (bot: any) => {
         });
 
         bot.hears('Удалить товар', (ctx: any) => {
-            ctx.reply('Удалить товар');
+            ctx.replyWithMarkdown('*УДАЛЕНИЕ ТОВАРА*');
+            ctx.scene.enter('deleteItem');
         });
 
         bot.hears('Инвентарь', (ctx: any) => {
