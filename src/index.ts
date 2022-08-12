@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 import startParseBot from './bot/start.js';
@@ -13,16 +14,18 @@ import startParseBot from './bot/start.js';
 //         console.log(err);
 //     });
 
-const bot = startParseBot();
+startParseBot()
+    .then((bot) => {
 
-const port = +process.env.PORT!;
+        const port = +process.env.PORT!;
 
-bot.launch({
-    webhook: {
-        domain: process.env.HEROKU_URL,
-        port: port || 3000
-    }
-});
+        bot.launch({
+            webhook: {
+                domain: process.env.HEROKU_URL,
+                port: port || 3000
+            }
+        });
+    })
 
 
 // console.log($);

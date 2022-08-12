@@ -1,25 +1,23 @@
-import { Telegraf, Scenes } from 'telegraf';
+import { Telegraf, Scenes, session } from 'telegraf';
 
-// import startDBConnect from '../db/db.connect.js';
+import startDBConnect from '../db/db.connect.js';
 
-// import { User } from '../db/models/user.model.js';
-// import { MESSAGES } from './messages.js';
-// import { mainKeyboard } from './keyboard.js';
-// import { startMainKeyboardListener } from './mainKeyboardListener.js';
+import { User } from '../db/models/user.model.js';
+import { MESSAGES } from './messages.js';
+import { mainKeyboard } from './keyboard.js';
+import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
-// import { setStageScenes } from './stage';
-// import express from 'express';
+import { setStageScenes } from './stage';
 
 
-export default function startParseBot() {
+export default async function startParseBot() {
 
-    // await startDBConnect();
+    await startDBConnect();
 
     let bot: Telegraf<Scenes.SceneContext>;
 
     bot = new Telegraf(process.env.BOT_TOKEN || '')
 
-    console.log(bot);
 
     // const app = express();
 
@@ -114,34 +112,34 @@ export default function startParseBot() {
     //     console.log(`\n\nServer running on port ${ port }.\n\n`);
     // });
 
-    // const stage = setStageScenes();
+    const stage = setStageScenes();
     //
-    // bot.use(session());
-    // bot.use(stage.middleware());
+    bot.use(session());
+    bot.use(stage.middleware());
     //
-    // // bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
-    //
-    //
-    // bot.start(async (ctx: any) => {
-    //
-    //     console.log(ctx);
-    //
-    //     const user = await User.findOneBy({ chatId: ctx.chat.id });
-    //
-    //     if (!user) {
-    //
-    //         await User.create(ctx);
-    //
-    //         await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
-    //
-    //     } else {
-    //         await ctx.reply('Hi there!', mainKeyboard);
-    //     }
+    // bot.webhookCallback(`${ process.env.HEROKU_URL }${ process.env.BOT_TOKEN }`);
     //
     //
-    // });
+    bot.start(async (ctx: any) => {
+
+        console.log(ctx);
+
+        const user = await User.findOneBy({ chatId: ctx.chat.id });
+
+        if (!user) {
+
+            await User.create(ctx);
+
+            await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
+
+        } else {
+            await ctx.reply('Hi there!', mainKeyboard);
+        }
+
+
+    });
     //
-    // startMainKeyboardListener(bot);
+    startMainKeyboardListener(bot);
 
     // bot.startWebhook
     // await bot.launch();
@@ -163,7 +161,7 @@ export default function startParseBot() {
     //     console.log(`Example app listening on port ${port}!`)
     // })
 
-    bot.on("text", (ctx) => ctx.replyWithHTML("<b>Hello</b>"));
+    // bot.on("text", (ctx) => ctx.replyWithHTML("<b>Hello</b>"));
 
     return bot;
 
