@@ -31,5 +31,7 @@ export const setStageScenes = () => {
         stockScene,
 
         deleteItemScene
-    ]);
+    ], {
+        ttl: 10,
+    });
 }
