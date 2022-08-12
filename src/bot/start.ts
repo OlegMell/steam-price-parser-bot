@@ -25,7 +25,8 @@ export default async function startParseBot() {
     //
     // app.use(express.json());
 
-    const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
+    // const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
+    const secretPath = `/telegraf`;
 
 
 
@@ -67,7 +68,7 @@ export default async function startParseBot() {
             */
             bot.handleUpdate(update)
                 .finally(() => {
-                    res.send('success')
+                    res.send(update);
                 })
         })
 
