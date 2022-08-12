@@ -23,7 +23,7 @@ export default async function startParseBot() {
 
     const port = process.env.PORT || 5000;
     //
-    // app.use(express.json());
+    app.use(express.json());
 
     // const secretPath = `/telegraf/${ bot.secretPathComponent() }`;
     const secretPath = `/telegraf`;
