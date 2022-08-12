@@ -50,26 +50,6 @@ export default async function startParseBot() {
         //
         //     console.log(update);
         //
-        //     /* Promise successful response:
-        //     >  {
-        //     >    message_id: 47,
-        //     >    from: {
-        //     >      id: 88,
-        //     >      is_bot: true,
-        //     >      first_name: 'what a day!',
-        //     >      username: 'what_a_day_bot'
-        //     >    },
-        //     >    chat: {
-        //     >      id: 255257629,
-        //     >      first_name: 'yeah boi',
-        //     >      username: 'yeah boi',
-        //     >      type: 'private'
-        //     >    },
-        //     >    date: 1603721253,
-        //     >    text: 'sup, gigga',
-        //     >    entities: [ { offset: 0, length: 10, type: 'bold' } ]
-        //     >  }
-        //     */
         //     bot.handleUpdate(update)
         //         .finally(() => {
         //             res.send(update);
@@ -122,8 +102,6 @@ export default async function startParseBot() {
     //
     bot.start(async (ctx: any) => {
 
-        console.log(ctx);
-
         const user = await User.findOneBy({ chatId: ctx.chat.id });
 
         if (!user) {
@@ -138,7 +116,7 @@ export default async function startParseBot() {
 
 
     });
-    //
+
     startMainKeyboardListener(bot);
 
     // bot.startWebhook
@@ -165,9 +143,5 @@ export default async function startParseBot() {
 
     return bot;
 
-
-    // Enable graceful stop
-    // process.once('SIGINT', () => bot.stop('SIGINT'));
-    // process.once('SIGTERM', () => bot.stop('SIGTERM'));
 }
 

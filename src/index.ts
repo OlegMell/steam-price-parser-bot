@@ -25,6 +25,9 @@ startParseBot()
                 port: port || 3000
             }
         });
+
+        process.once('SIGINT', () => bot.stop('SIGINT'));
+        process.once('SIGTERM', () => bot.stop('SIGTERM'));
     })
 
 

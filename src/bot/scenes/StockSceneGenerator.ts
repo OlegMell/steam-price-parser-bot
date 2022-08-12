@@ -32,10 +32,11 @@ export class StockSceneGenerator {
 
             if (userItems && userItems.items && userItems.items.length) {
 
-                this.#userItems = userItems.items;
-
-                const length: number = userItems?.items?.length;
                 const { items } = userItems;
+
+                this.#userItems = items;
+
+                const length: number = items?.length;
 
                 for (let i = 0; i < length; i++) {
 
@@ -57,8 +58,6 @@ export class StockSceneGenerator {
             } else {
                 await ctx.replyWithMarkdown('*Пусто! Вы ещё ничего не добавили!*');
             }
-
-
         });
 
         showStock.hears('Назад', async (ctx: any) => {
@@ -68,11 +67,13 @@ export class StockSceneGenerator {
             }
 
             this.#userItems = [];
+
             await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
             await ctx.scene.leave();
         });
 
         showStock.on('callback_query', async (ctx: any) => {
+
             const action = ctx.update.callback_query.data;
 
             const item = this.#userItems.find(i => i.id === action);
@@ -90,8 +91,6 @@ export class StockSceneGenerator {
             }
 
         });
-
-
 
 
         return showStock;
