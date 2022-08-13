@@ -22,7 +22,7 @@ startParseBot()
         bot.launch({
             webhook: {
                 domain: process.env.HEROKU_URL,
-                port: port || 3000
+                port: port || 5000,
             }
         });
 
