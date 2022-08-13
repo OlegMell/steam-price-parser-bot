@@ -73,75 +73,75 @@ export default async function startParseBot() {
 
         // if (users) {
 
-            // for (const user of users) {
+        // for (const user of users) {
 
-                // if (userR && userR.items && userR.items!.length) {
-                //
-                //     for (const userItem of userR.items!) {
-                //
-                //         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
-                //
-                //         await page.waitForSelector('span.market_commodity_orders_header_promote');
-                //
-                //         const c = await page.content();
-                //         const dom = new JSDOM(c);
-                //
-                //         let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
-                //
-                //         price = helpers.getClearPrice(price!);
-                //
-                //         await ctx.replyWithMarkdown(`*Найденная цена:* ${ price }`);
-                //
-                //     }
-                // }
+        // if (userR && userR.items && userR.items!.length) {
+        //
+        //     for (const userItem of userR.items!) {
+        //
+        //         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
+        //
+        //         await page.waitForSelector('span.market_commodity_orders_header_promote');
+        //
+        //         const c = await page.content();
+        //         const dom = new JSDOM(c);
+        //
+        //         let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+        //
+        //         price = helpers.getClearPrice(price!);
+        //
+        //         await ctx.replyWithMarkdown(`*Найденная цена:* ${ price }`);
+        //
+        //     }
+        // }
 
-            // }
+        // }
 
         // }
 
         // await browser.close();
 
 
-        setInterval(async () => {
-
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-
-            const userR: IUSer | null = await UserModel
-                .findOne({ chatId: ctx.chat.id })
-                .populate({
-                    path: 'items',
-                }).exec();
-
-            // if (users) {
-
-            // for (const user of users) {
-
-            if (userR && userR.items && userR.items!.length) {
-
-                for (const userItem of userR.items!) {
-
-                    await page.goto(userItem.link, { waitUntil: 'networkidle2' });
-
-                    await page.waitForSelector('span.market_commodity_orders_header_promote');
-
-                    const c = await page.content();
-                    const dom = new JSDOM(c);
-
-                    let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
-
-                    price = helpers.getClearPrice(price!);
-
-                    await ctx.replyWithMarkdown(`*Найденная цена:* ${ price }`);
-
-                }
-                // }
-
-            }
-        }, 900000);
-
-
     });
+
+
+    setInterval(async () => {
+
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+
+        const userR: IUSer[] | null = await UserModel
+            .find()
+            .populate({
+                path: 'items',
+            }).exec();
+
+        if (userR) {
+
+            for (const user of userR) {
+
+                if (user && user.items && user.items!.length) {
+
+                    for (const userItem of user.items!) {
+
+                        await page.goto(userItem.link, { waitUntil: 'networkidle2' });
+
+                        await page.waitForSelector('span.market_commodity_orders_header_promote');
+
+                        const c = await page.content();
+                        const dom = new JSDOM(c);
+
+                        let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+
+                        price = helpers.getClearPrice(price!);
+
+                        await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
+
+                    }
+                }
+            }
+        }
+    }, 9000);
 
     startMainKeyboardListener(bot);
 
