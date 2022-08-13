@@ -130,10 +130,8 @@ export default async function startParseBot() {
 
                         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
 
-                        page.waitForSelector('span.market_commodity_orders_header_promote', {
-                            timeout: 80000,
-                            visible: true
-                        }).then(async () => {
+                        page.waitForSelector('span.market_commodity_orders_header_promote')
+                            .then(async () => {
                             const c = await page.content();
                             const dom = new JSDOM(c);
 
