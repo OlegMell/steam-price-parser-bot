@@ -8,6 +8,8 @@ import { MESSAGES } from './messages.js';
 import { mainKeyboard } from './keyboard.js';
 import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
+import { JSDOM } from 'jsdom';
+
 import { setStageScenes } from './stage';
 import { UserModel } from '../db/db.config';
 // import { Item } from '../db/interfaces/item.interface';
@@ -45,22 +47,59 @@ export default async function startParseBot() {
         }
 
 
-
         // setInterval(async () => {
 
-            // await page.waitForSelector('span.market_commodity_orders_header_promote');
-            //
-            // const c =  await page.content();
-            // const dom = new JSDOM(c);
-            //
-            // let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+        // await page.waitForSelector('span.market_commodity_orders_header_promote');
+        //
+        // const c =  await page.content();
+        // const dom = new JSDOM(c);
+        //
+        // let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
 
-            // const currentPrice = getClearPrice(price);
-
+        // const currentPrice = getClearPrice(price);
 
 
         // }, 3000);
 
+
+        // const browser = await puppeteer.launch();
+        // const page = await browser.newPage();
+
+        // const userR: IUSer | null = await UserModel
+        //     .findOne({ chatId: ctx.chat.id })
+        //     .populate({
+        //         path: 'items',
+        //     }).exec();
+
+        // if (users) {
+
+            // for (const user of users) {
+
+                // if (userR && userR.items && userR.items!.length) {
+                //
+                //     for (const userItem of userR.items!) {
+                //
+                //         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
+                //
+                //         await page.waitForSelector('span.market_commodity_orders_header_promote');
+                //
+                //         const c = await page.content();
+                //         const dom = new JSDOM(c);
+                //
+                //         let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+                //
+                //         price = helpers.getClearPrice(price!);
+                //
+                //         await ctx.replyWithMarkdown(`*Найденная цена:* ${ price }`);
+                //
+                //     }
+                // }
+
+            // }
+
+        // }
+
+        // await browser.close();
 
 
         setInterval(async () => {
@@ -68,43 +107,38 @@ export default async function startParseBot() {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
 
-            const users: IUSer[] | null = await UserModel
-                .find()
+            const userR: IUSer | null = await UserModel
+                .findOne({ chatId: ctx.chat.id })
                 .populate({
                     path: 'items',
                 }).exec();
 
-            if (users) {
+            // if (users) {
 
-                for (const user of users) {
+            // for (const user of users) {
 
-                    if (!user.items && !user.items!.length) {
-                        return;
-                    }
+            if (userR && userR.items && userR.items!.length) {
 
-                    for (const userItem of user.items!) {
+                for (const userItem of userR.items!) {
 
-                        await page.goto(userItem.link, { waitUntil: 'networkidle2' });
+                    await page.goto(userItem.link, { waitUntil: 'networkidle2' });
 
-                        await page.waitForSelector('span.market_commodity_orders_header_promote');
+                    await page.waitForSelector('span.market_commodity_orders_header_promote');
 
-                        const c =  await page.content();
-                        const dom = new JSDOM(c);
+                    const c = await page.content();
+                    const dom = new JSDOM(c);
 
-                        let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+                    let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
 
-                        price = helpers.getClearPrice(price);
+                    price = helpers.getClearPrice(price!);
 
-                        await ctx.replyWithMarkdown(`*Найденная цена:* ${price}`);
+                    await ctx.replyWithMarkdown(`*Найденная цена:* ${ price }`);
 
-                    }
                 }
+                // }
 
             }
-
-            await browser.close();
-
-        }, 8000);
+        }, 900000);
 
 
     });
