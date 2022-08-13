@@ -130,24 +130,27 @@ export default async function startParseBot() {
 
                         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
 
-                        await page.waitForSelector('span.market_commodity_orders_header_promote');
+                        page.waitForSelector('span.market_commodity_orders_header_promote', {
+                            timeout: 80000
+                        }).then(async () => {
+                            const c = await page.content();
+                            const dom = new JSDOM(c);
 
-                        const c = await page.content();
-                        const dom = new JSDOM(c);
+                            let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
 
-                        let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+                            price = helpers.getClearPrice(price!);
 
-                        price = helpers.getClearPrice(price!);
-
-                        await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
-
+                            await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
+                        }).catch((err) => {
+                            console.log(err);
+                        });
                     }
                 }
             }
         }
 
         await browser.close();
-    }, 15000);
+    }, 120000);
 
     startMainKeyboardListener(bot);
 
