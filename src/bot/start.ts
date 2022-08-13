@@ -130,19 +130,18 @@ export default async function startParseBot() {
 
                         await page.goto(userItem.link, { waitUntil: 'networkidle2' });
 
-                        page.waitForSelector('span.market_commodity_orders_header_promote')
-                            .then(async () => {
-                            const c = await page.content();
-                            const dom = new JSDOM(c);
-
-                            let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
-
-                            price = helpers.getClearPrice(price!);
-
-                            await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
-                        }).catch((err) => {
-                            console.log(err);
+                        await page.waitForSelector('span.market_commodity_orders_header_promote', {
+                            timeout: 0
                         });
+
+                        const c = await page.content();
+                        const dom = new JSDOM(c);
+
+                        let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
+
+                        price = helpers.getClearPrice(price!);
+
+                        await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
                     }
                 }
             }
