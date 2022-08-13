@@ -145,7 +145,9 @@ export default async function startParseBot() {
                 }
             }
         }
-    }, 9000);
+
+        await browser.close();
+    }, 15000);
 
     startMainKeyboardListener(bot);
 

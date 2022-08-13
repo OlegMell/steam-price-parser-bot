@@ -24,12 +24,14 @@ startParseBot()
                 domain: process.env.HEROKU_URL,
                 port: port || 5000,
             }
+        }).catch(err => {
+            console.log('ERROR!!!!!', err);
         });
 
         // bot.launch()
 
-        // process.once('SIGINT', () => bot.stop('SIGINT'));
-        // process.once('SIGTERM', () => bot.stop('SIGTERM'));
+        process.once('SIGINT', () => bot.stop('SIGINT'));
+        process.once('SIGTERM', () => bot.stop('SIGTERM'));
     })
 
 
