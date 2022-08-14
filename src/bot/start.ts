@@ -3,23 +3,23 @@ import { Telegraf, Scenes, session } from 'telegraf';
 import startDBConnect from '../db/db.connect.js';
 
 import { User } from '../db/models/user.model.js';
-import { User as IUSer } from '../db/interfaces/user.interface';
+// import { User as IUSer } from '../db/interfaces/user.interface';
 import { MESSAGES } from './messages.js';
 import { mainKeyboard } from './keyboard.js';
 import { startMainKeyboardListener } from './mainKeyboardListener.js';
 
-import { JSDOM } from 'jsdom';
+// import { JSDOM } from 'jsdom';
 
 import { setStageScenes } from './stage';
-import { UserModel } from '../db/db.config';
+// import { UserModel } from '../db/db.config';
 // import { Item } from '../db/interfaces/item.interface';
 
 // import rp from 'request-promise';
-import puppeteer from 'puppeteer';
-import { helpers } from '../helpers/helpers';
+// import puppeteer from 'puppeteer';
+// import { helpers } from '../helpers/helpers';
 
 
-export default async function startParseBot() {
+export default async function startParseBot(): Promise<Telegraf<Scenes.SceneContext>> {
 
     await startDBConnect();
 
@@ -103,52 +103,6 @@ export default async function startParseBot() {
 
 
     });
-
-
-    setInterval(async () => {
-
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [ '--no-sandbox' ]
-        });
-
-        const page = await browser.newPage();
-
-        const userR: IUSer[] | null = await UserModel
-            .find()
-            .populate({
-                path: 'items',
-            }).exec();
-
-        if (userR) {
-
-            for (const user of userR) {
-
-                if (user && user.items && user.items!.length) {
-
-                    for (const userItem of user.items!) {
-
-                        await page.goto(userItem.link, { waitUntil: 'networkidle2' });
-
-                        await page.waitForSelector('span.market_commodity_orders_header_promote', {
-                            timeout: 0
-                        });
-
-                        const c = await page.content();
-                        const dom = new JSDOM(c);
-
-                        let price = dom.window.document.querySelectorAll('span.market_commodity_orders_header_promote')[1].textContent;
-
-                        price = helpers.getClearPrice(price!);
-
-                        await bot.telegram.sendMessage(user.chatId, `*Найденная цена:* ${ price }`);
-                    }
-                }
-            }
-        }
-
-        await browser.close();
-    }, 360 * 60000);
 
     startMainKeyboardListener(bot);
 
