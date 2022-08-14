@@ -18,9 +18,7 @@ import { DOMHelper } from './DOMHelper';
     await startDBConnect();
 
     const sendMessage = (chatId: string | number, msg: string) => {
-        return bot.telegram.sendMessage(chatId, msg, {
-            parse_mode: 'MarkdownV2',
-        });
+        return bot.telegram.sendMessage(chatId, msg);
     }
 
     const getUsersPopulate = (): Promise<IUSer[] | null> => {
