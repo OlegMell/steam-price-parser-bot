@@ -1,24 +1,31 @@
+import { BUTTON_TEXT } from './buttonText';
+import { MESSAGES } from './messages';
+
+
 export const startMainKeyboardListener = (bot: any) => {
 
-        bot.hears('Добавить товар', async (ctx: any) => {
-            await bot.telegram.sendMessage(ctx.chat.id, 'ДОБАВЛЕНИЕ ТОВАРА', {
-                reply_markup: {
-                    remove_keyboard: true
-                }
-            });
-            await ctx.scene.enter('addItemName');
+    bot.hears(BUTTON_TEXT.ADD_ITEM, async (ctx: any) => {
+
+        await bot.telegram.sendMessage(ctx.chat.id, MESSAGES.ADD_ITEM, {
+            reply_markup: {
+                remove_keyboard: true
+            }
         });
 
-        bot.hears('Удалить товар', async (ctx: any) => {
-            await ctx.replyWithMarkdown('*УДАЛЕНИЕ ТОВАРА*');
-            await ctx.scene.enter('deleteItem');
-        });
+        await ctx.scene.enter('addItemName');
 
-        bot.hears('Инвентарь', async (ctx: any) => {
-            await ctx.replyWithMarkdown('*ИНВЕНТАРЬ*');
-            await ctx.scene.enter('showStock');
-        });
+    });
 
-    }
+    bot.hears(BUTTON_TEXT.REMOVE_ITEM, async (ctx: any) => {
+        await ctx.replyWithMarkdown(`*${ MESSAGES.REMOVE_ITEM }*`);
+        await ctx.scene.enter('deleteItem');
+    });
+
+    bot.hears(BUTTON_TEXT.STOCK, async (ctx: any) => {
+        await ctx.replyWithMarkdown(`*${ MESSAGES.STOCK }*`);
+        await ctx.scene.enter('showStock');
+    });
+
+}
 
 

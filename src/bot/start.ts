@@ -30,10 +30,12 @@ export default async function startParseBot(): Promise<Telegraf<Scenes.SceneCont
 
             await User.create(ctx);
 
+            await ctx.reply(MESSAGES.HELLO + ctx.chat.first_name);
+
             await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
 
         } else {
-            await ctx.reply('Hi there!', mainKeyboard);
+            await ctx.reply(MESSAGES.HELLO + ctx.chat.first_name, mainKeyboard);
         }
 
     });
