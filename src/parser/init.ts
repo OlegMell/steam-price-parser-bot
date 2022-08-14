@@ -68,7 +68,7 @@ import { DOMHelper } from './DOMHelper';
 
         await puppeteerHelper.close();
 
-    }, Intervals.MINUTE * 2);
+    }, Intervals.HOUR6);
 
     process.once('SIGINT', () => {
         bot.stop('SIGINT');
