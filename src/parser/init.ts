@@ -31,8 +31,6 @@ import { DOMHelper } from './DOMHelper';
 
     const puppeteerHelper = new PuppeteerHelper();
 
-    await puppeteerHelper.createBrowserPage();
-
     const intervalId = setInterval(async () => {
 
         // const browser = await puppeteer.launch({
@@ -42,6 +40,7 @@ import { DOMHelper } from './DOMHelper';
         //
         // const page = await browser.newPage();
 
+        await puppeteerHelper.createBrowserPage();
 
         const users: IUSer[] | null = await getUsersPopulate();
 
