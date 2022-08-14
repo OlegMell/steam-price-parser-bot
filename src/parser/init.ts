@@ -8,7 +8,7 @@ import { helpers } from '../helpers/helpers';
 import startDBConnect from '../db/db.connect';
 
 
-export const initParser = async (): Promise<void> => {
+(async () => {
 
     const bot = new Telegraf(process.env.BOT_TOKEN || '');
 
@@ -58,6 +58,6 @@ export const initParser = async (): Promise<void> => {
 
         await browser.close();
     }, 120000);
-}
+})()
 
 // 360 * 60000 = 6 hours
