@@ -57,7 +57,8 @@ import startDBConnect from '../db/db.connect';
         }
 
         await browser.close();
-    }, 120000);
+
+    }, 180 * 60000);
 })()
 
 // 360 * 60000 = 6 hours
