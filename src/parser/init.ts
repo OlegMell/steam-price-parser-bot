@@ -1,11 +1,14 @@
 import { Telegraf } from 'telegraf';
-import { JSDOM } from 'jsdom';
-import puppeteer from 'puppeteer';
 
-import { User as IUSer } from '../db/interfaces/user.interface';
+import { Intervals } from './configs';
 import { UserModel } from '../db/db.config';
 import { helpers } from '../helpers/helpers';
 import startDBConnect from '../db/db.connect';
+import { User as IUSer } from '../db/interfaces/user.interface';
+import { createNotFoundPriceMessage, createPriceMessage } from '../bot/messages';
+
+import { PuppeteerHelper } from './PuppeteerHelper';
+import { DOMHelper } from './DOMHelper';
 
 
 (async () => {
@@ -14,51 +17,89 @@ import startDBConnect from '../db/db.connect';
 
     await startDBConnect();
 
-    setInterval(async () => {
+    const sendMessage = (chatId: string | number, msg: string) => {
+        return bot.telegram.sendMessage(chatId, msg);
+    }
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [ '--no-sandbox' ]
-        });
-
-        const page = await browser.newPage();
-
-        const userR: IUSer[] | null = await UserModel
+    const getUsersPopulate = (): Promise<IUSer[] | null> => {
+        return UserModel
             .find()
             .populate({
                 path: 'items',
             }).exec();
+    };
 
-        if (userR) {
+    const puppeteerHelper = new PuppeteerHelper();
 
-            for (const user of userR) {
+    await puppeteerHelper.createBrowserPage();
 
-                if (user && user.items && user.items!.length) {
+    const intervalId = setInterval(async () => {
 
-                    for (const userItem of user.items!) {
+        // const browser = await puppeteer.launch({
+        //     headless: true,
+        //     args: [ '--no-sandbox' ]
+        // });
+        //
+        // const page = await browser.newPage();
 
-                        await page.goto(userItem.link, { waitUntil: 'networkidle2' });
 
-                        await page.waitForSelector(userItem.selectorHTML, {
-                            timeout: 0
-                        });
+        const users: IUSer[] | null = await getUsersPopulate();
 
-                        const c = await page.content();
-                        const dom = new JSDOM(c);
+        if (users && users.length) {
 
-                        let price = dom.window.document.querySelectorAll(userItem.selectorHTML)[1].textContent;
+            for (const user of users) {
 
-                        price = helpers.getClearPrice(price!);
+                if (user && user.items && user.items.length) {
 
-                        await bot.telegram.sendMessage(user.chatId, `Товар: ${userItem.name}\nНАЧАЛЬНАЯ ЦЕНА $${userItem.initialPrice}\nНОВАЯ ЦЕНА: $${ price }`);
+                    for (const userItem of user.items) {
+
+                        // await page.goto(userItem.link, { waitUntil: 'networkidle2' });
+                        await puppeteerHelper.goTo(userItem.link);
+
+                        // await page.waitForSelector(userItem.selectorHTML, {
+                        //     timeout: 0
+                        // });
+
+                        // await puppeteerHelper.waitForSelector(userItem.selectorHTML);
+
+                        const pageContent: string = await puppeteerHelper.getPageContent(userItem.selectorHTML);
+
+                        // const dom: JSDOM = new JSDOM(pageContent);
+
+                        const domHelper: DOMHelper = new DOMHelper(pageContent);
+
+                        let price: string | null = domHelper.getTextFrom(userItem.selectorHTML);
+
+                        if (price) {
+                            price = helpers.getClearPrice(price!);
+                            await sendMessage(user.chatId, createPriceMessage(userItem, price));
+                            // await bot.telegram.sendMessage(user.chatId, createPriceMessage(userItem, price));
+
+                        } else {
+                            await sendMessage(user.chatId, createNotFoundPriceMessage(userItem));
+                            // await bot.telegram.sendMessage(user.chatId, createNotFoundPriceMessage(userItem));
+                        }
+
+
                     }
                 }
             }
         }
 
-        await browser.close();
+        await puppeteerHelper.close();
 
-    }, 180 * 60000);
-})()
+    }, Intervals.HOUR3);
 
-// 360 * 60000 = 6 hours
+    process.once('SIGINT', () => {
+        bot.stop('SIGINT');
+        clearInterval(intervalId);
+        puppeteerHelper.close();
+    });
+
+    process.once('SIGTERM', () => {
+        bot.stop('SIGTERM');
+        clearInterval(intervalId);
+        puppeteerHelper.close();
+    });
+
+})();
