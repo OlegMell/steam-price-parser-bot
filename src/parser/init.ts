@@ -50,7 +50,7 @@ import startDBConnect from '../db/db.connect';
 
                         price = helpers.getClearPrice(price!);
 
-                        await bot.telegram.sendMessage(user.chatId, `***НАЧАЛЬНАЯ ЦЕНА***\n$${userItem.initialPrice}\n***НОВАЯ ЦЕНА:***\n$${ price }`);
+                        await bot.telegram.sendMessage(user.chatId, `Товар: ${userItem.name}\nНАЧАЛЬНАЯ ЦЕНА $${userItem.initialPrice}\nНОВАЯ ЦЕНА: $${ price }`);
                     }
                 }
             }
@@ -58,13 +58,6 @@ import startDBConnect from '../db/db.connect';
 
         await browser.close();
     }, 120000);
-
-    bot.launch({
-        webhook: {
-            domain: process.env.HEROKU_URL!,
-            port: +process.env.PORT! || 5000
-        }
-    });
 })()
 
 // 360 * 60000 = 6 hours
