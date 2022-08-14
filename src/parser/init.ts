@@ -58,6 +58,13 @@ import startDBConnect from '../db/db.connect';
 
         await browser.close();
     }, 120000);
+
+    bot.launch({
+        webhook: {
+            domain: process.env.HEROKU_URL!,
+            port: +process.env.PORT! || 5000
+        }
+    });
 })()
 
 // 360 * 60000 = 6 hours
