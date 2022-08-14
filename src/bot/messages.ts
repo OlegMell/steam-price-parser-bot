@@ -15,9 +15,9 @@ export enum MESSAGES {
 export const itemStockMsg = (item: Item): string => `${ item.name! } - ${ item.initialPrice }\n\n${ item.link }`;
 
 export const createPriceMessage = ({ name, initialPrice, }: Item, price: string): string => {
-    return `ТОВАР: ${ name }\nНАЧАЛЬНАЯ ЦЕНА $${ initialPrice }\nНОВАЯ ЦЕНА: $${ price }`;
+    return `*ТОВАР:* ${ name }\n*НАЧАЛЬНАЯ ЦЕНА:* $${ initialPrice }\n*НОВАЯ ЦЕНА:* $${ price }`;
 }
 
 export const createNotFoundPriceMessage = ({ name }: Item): string => {
-    return `По товару ${ name } цена не найдена! Проверьте CSS селектор в Инвентаре.`;
+    return `+По товару* ${ name } *цена не найдена! Проверьте CSS селектор в Инвентаре*`;
 }

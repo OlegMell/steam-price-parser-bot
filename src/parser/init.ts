@@ -18,7 +18,9 @@ import { DOMHelper } from './DOMHelper';
     await startDBConnect();
 
     const sendMessage = (chatId: string | number, msg: string) => {
-        return bot.telegram.sendMessage(chatId, msg);
+        return bot.telegram.sendMessage(chatId, msg, {
+            parse_mode: 'MarkdownV2',
+        });
     }
 
     const getUsersPopulate = (): Promise<IUSer[] | null> => {
@@ -33,13 +35,6 @@ import { DOMHelper } from './DOMHelper';
 
     const intervalId = setInterval(async () => {
 
-        // const browser = await puppeteer.launch({
-        //     headless: true,
-        //     args: [ '--no-sandbox' ]
-        // });
-        //
-        // const page = await browser.newPage();
-
         await puppeteerHelper.createBrowserPage();
 
         const users: IUSer[] | null = await getUsersPopulate();
@@ -52,18 +47,9 @@ import { DOMHelper } from './DOMHelper';
 
                     for (const userItem of user.items) {
 
-                        // await page.goto(userItem.link, { waitUntil: 'networkidle2' });
                         await puppeteerHelper.goTo(userItem.link);
 
-                        // await page.waitForSelector(userItem.selectorHTML, {
-                        //     timeout: 0
-                        // });
-
-                        // await puppeteerHelper.waitForSelector(userItem.selectorHTML);
-
                         const pageContent: string = await puppeteerHelper.getPageContent(userItem.selectorHTML);
-
-                        // const dom: JSDOM = new JSDOM(pageContent);
 
                         const domHelper: DOMHelper = new DOMHelper(pageContent);
 
@@ -72,11 +58,8 @@ import { DOMHelper } from './DOMHelper';
                         if (price) {
                             price = helpers.getClearPrice(price!);
                             await sendMessage(user.chatId, createPriceMessage(userItem, price));
-                            // await bot.telegram.sendMessage(user.chatId, createPriceMessage(userItem, price));
-
                         } else {
                             await sendMessage(user.chatId, createNotFoundPriceMessage(userItem));
-                            // await bot.telegram.sendMessage(user.chatId, createNotFoundPriceMessage(userItem));
                         }
 
 
