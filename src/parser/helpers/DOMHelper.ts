@@ -8,8 +8,8 @@ export class DOMHelper {
         this.#dom = new JSDOM(pageContent);
     }
 
-    getTextFrom(selector: string): string | null {
-        return this.#dom.window.document.querySelectorAll(selector)[1].textContent;
+    getTextFrom(selector: string, position?: number): string | null {
+        return this.#dom.window.document.querySelectorAll(selector)[position || 0].textContent;
     }
 
 }

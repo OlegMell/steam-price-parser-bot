@@ -3,5 +3,7 @@ export enum BUTTON_TEXT {
 
     REMOVE_ITEM = 'Удалить товар',
 
+    SHOW_PRICES = 'Текущие цены',
+
     STOCK = 'Инвентарь',
 }

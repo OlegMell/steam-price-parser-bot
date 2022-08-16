@@ -3,10 +3,13 @@ import { helpers } from '../../helpers/helpers';
 import { Update } from 'telegraf/typings/core/types/typegram';
 import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
 import { ItemModel, UserModel } from '../../db/db.config';
+import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
+import { DOMHelper } from '../../parser/helpers/DOMHelper';
+import { CSS_SELECTORS } from '../../parser/configs';
 
 export class AddItemSceneGenerator {
 
-    #createdItemTempl: { name: string, link: string, initialPrice: number, selectorHTML: string } | undefined;
+    #createdItemTempl: { name?: string, link: string, initialPrice: number, selectorHTML?: string } | undefined;
 
     addItemNameScene() {
         const addItemName = new Scenes.BaseScene<Scenes.SceneContext>('addItemName');
@@ -33,7 +36,7 @@ export class AddItemSceneGenerator {
         const addItem = new Scenes.BaseScene<Scenes.SceneContext>('addItem');
 
         addItem.enter(async (ctx: any) => {
-
+            this.#createdItemTempl = {} as { name: string, link: string, initialPrice: number, selectorHTML: string };
 
             await ctx.reply('Введите ссылку на товар:');
         });
@@ -69,7 +72,7 @@ export class AddItemSceneGenerator {
                 await ctx.scene.reenter();
             } else {
                 this.#createdItemTempl!.initialPrice = initialPrice;
-                await ctx.scene.enter('addItemSelector');
+                await ctx.scene.enter('addItemConfirm');
             }
 
         });
@@ -89,9 +92,6 @@ export class AddItemSceneGenerator {
 
             this.#createdItemTempl!.selectorHTML = ctx.message.text;
 
-            await ctx.replyWithMarkdown('*ВЫ ДОБАВЛЯЕТЕ:*');
-            await ctx.reply(`${ this.#createdItemTempl!.name }\n${ this.#createdItemTempl!.link }\n${ this.#createdItemTempl!.initialPrice }\n${ this.#createdItemTempl!.selectorHTML }`)
-
             await ctx.scene.enter('addItemConfirm');
         });
 
@@ -103,12 +103,43 @@ export class AddItemSceneGenerator {
         const addItemConfirm = new Scenes.BaseScene<Scenes.SceneContext>('addItemConfirm');
 
         addItemConfirm.enter(async (ctx: any) => {
-            await ctx.replyWithMarkdown('*Сохранить товар?*', addItemConfirmKeyboard);
+
+            await ctx.replyWithMarkdown('*ОЖИДАЙТЕ, ИДЕТ ПОИСК ТОВАРА...*');
+
+            const puppeteerHelper = new PuppeteerHelper();
+
+            await puppeteerHelper.createBrowserPage();
+
+            await puppeteerHelper.goTo(this.#createdItemTempl?.link!);
+
+            const pageContent: string = await puppeteerHelper.getPageContent(CSS_SELECTORS.ITEM_NAME);
+
+            if (!pageContent) {
+
+                await ctx.replyWithMarkdown('*ERROR*\n*ВОЗНИКЛИ ПРОБЛЕМЫ С САЙТОМ. ПОПРОБУЙТЕ СНАЧАЛА*', mainKeyboard);
+                await ctx.scene.enter('addItem');
+
+            } else {
+                const domHelper: DOMHelper = new DOMHelper(pageContent);
+
+                const itemName: string | null = domHelper.getTextFrom(CSS_SELECTORS.ITEM_NAME);
+
+                this.#createdItemTempl!.name = itemName || 'НАЗВАНИЕ НЕ НАЙДЕНО';
+
+                await ctx.replyWithMarkdown('*ВЫ ДОБАВЛЯЕТЕ:*');
+
+                await ctx.replyWithMarkdown(`Название товара: *${ this.#createdItemTempl!.name }*\nНачальная цена: *$${ this.#createdItemTempl!.initialPrice }*\nСсылка: ${ this.#createdItemTempl!.link }`)
+
+                await ctx.replyWithMarkdown('*СОХРАНИТЬ ТОВАР?*', addItemConfirmKeyboard);
+            }
         });
 
         addItemConfirm.hears('Да', async (ctx: any) => {
 
-            const newItem = await ItemModel.create(this.#createdItemTempl);
+            const newItem = await ItemModel.create({
+                ...this.#createdItemTempl,
+                selectorHTML: CSS_SELECTORS.ITEM_PRICE
+            });
 
             const user = await UserModel.findOne({ chatId: ctx.chat.id });
 
@@ -122,8 +153,8 @@ export class AddItemSceneGenerator {
                         ]
                     }
                 })
-                    .then(() => ctx.replyWithMarkdown('*Товар успешно сохранен*', mainKeyboard))
-                    .catch(() => ctx.replyWithMarkdown('* Не удалось сохранить товар! Попробуйте позже :( *', mainKeyboard));
+                    .then(() => ctx.replyWithMarkdown('*ТОВАР УСПЕШНО СОХРАНЕН*', mainKeyboard))
+                    .catch(() => ctx.replyWithMarkdown('* НЕ УДАЛОСЬ СОХРАНИТЬ ТОВАР! ПОПРОБУЙТЕ ПОЗЖЕ :( *', mainKeyboard));
             }
 
             addItemConfirm.leave();

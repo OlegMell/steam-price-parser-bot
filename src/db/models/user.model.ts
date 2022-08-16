@@ -1,5 +1,6 @@
 import { UserModel } from "../db.config.js";
 import { helpers } from "../../helpers/helpers.js";
+import { User as IUSer } from '../interfaces/user.interface';
 
 
 export const User = {
@@ -17,6 +18,14 @@ export const User = {
             crypts: []
         });
 
-    }
+    },
+
+    getUsersPopulate: async (): Promise<IUSer[] | null> => {
+        return UserModel
+            .find()
+            .populate({
+                path: 'items',
+            }).exec();
+    },
 
 }

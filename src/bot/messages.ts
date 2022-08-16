@@ -9,15 +9,22 @@ export enum MESSAGES {
 
     REMOVE_ITEM = 'УДАЛЕНИЕ ТОВАРА',
 
-    STOCK = 'ИНВЕНТАРЬ'
+    SHOW_PRICES = 'ТЕКУЩИЕ ЦЕНЫ',
+
+    STOCK = 'ИНВЕНТАРЬ',
+
+    FETCH_HTML_ERROR = ''
 }
 
-export const itemStockMsg = (item: Item): string => `${ item.name! } - ${ item.initialPrice }\n\n${ item.link }`;
+export const createItemStockMsg = (item: Item): string => `НАЗВАНИЕ ТОВАРА: *${ item.name! }*\nНАЧАЛЬНАЯ ЦЕНА: *$${ item.initialPrice }*`;
 
-export const createPriceMessage = ({ name, initialPrice, }: Item, price: string): string => {
+export const priceMessage = ({ name, initialPrice, }: Item, price: string): string => {
     return `ТОВАР: ${ name }\nНАЧАЛЬНАЯ ЦЕНА: $${ initialPrice }\nНОВАЯ ЦЕНА: $${ price }`;
 }
 
-export const createNotFoundPriceMessage = ({ name }: Item): string => {
-    return `По товару ${ name } цена не найдена! Проверьте CSS селектор в Инвентаре.`;
+export const notFoundPriceMessage = ({ name }: Item): string => {
+    return `ПО ТОВАРУ ${ name } ЦЕНА НЕ НАЙДЕНА!\nПОПРОБУЙТЕ ВЫПОЛНИТЬ ПОИСК ЦЕН ВРУЧНУЮ ИЛИ ДОЖДИТЕСЬ СЛЕДУЮЩЕЙ РАССЫЛКИ!`;
 }
+
+export const fetchPageErrorMessage = (itemName: string): string =>
+    `НЕ УДАЛОСЬ ПОЛУЧИТЬ HTML СТРАНИЦУ ТОВАРА: ${itemName}\nПОПРОБУЙТЕ ВЫПОЛНИТЬ ПОИСК ЦЕН ВРУЧНУЮ!`;

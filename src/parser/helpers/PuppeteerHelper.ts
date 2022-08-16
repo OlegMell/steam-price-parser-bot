@@ -54,8 +54,14 @@ export class PuppeteerHelper {
     }
 
     async getPageContent(selector: string): Promise<string> {
-        await this.waitForSelector(selector);
-        return this.#page.content();
+
+        return this.waitForSelector(selector)
+            .then(() => {
+                return this.#page.content();
+            })
+            .catch(() => {
+                return '';
+            });
     }
 
     async close(): Promise<void> {
