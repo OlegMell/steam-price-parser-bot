@@ -3,8 +3,9 @@ import { Markup, Scenes } from 'telegraf';
 import { ItemModel, UserModel } from '../../db/db.config';
 import { User } from '../../db/interfaces/user.interface';
 import { createURLButton, mainKeyboard } from '../keyboard';
-import { createItemStockMsg } from '../messages';
+import { createItemStockMsg, deleteItemMessage, MESSAGES } from '../messages';
 import { Item } from '../../db/interfaces/item.interface';
+import mongoose, { Schema } from 'mongoose';
 
 
 export class StockSceneGenerator {
@@ -87,8 +88,21 @@ export class StockSceneGenerator {
                     await ctx.telegram.deleteMessage(ctx.chat.id, msg.msgId);
                 }
 
+                const currentUser: any = await UserModel.findOne({ chatId: ctx.chat.id });
+
+                if (!currentUser) {
+                    return await ctx.replyWithMarkdown(`*${ MESSAGES.USER_SEARCH_ERROR }*`)
+                }
+
+                this.#msgs = this.#msgs.filter((msg: any) => msg.itemId !== item.id);
+
+                currentUser.items = currentUser.items.filter((i: any) => i._id.toString() !== item.id);
+                currentUser.save();
+
                 await ItemModel.deleteOne({ _id: item.id }).exec();
-                await ctx.replyWithMarkdown(`*${ item.name } был удален*`);
+
+                await ctx.replyWithMarkdown(`*${ deleteItemMessage(item.name) }*`);
+
             }
 
         });

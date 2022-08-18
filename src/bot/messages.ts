@@ -13,7 +13,15 @@ export enum MESSAGES {
 
     STOCK = 'ИНВЕНТАРЬ',
 
-    FETCH_HTML_ERROR = ''
+    FETCH_HTML_ERROR_MD = '*ERROR*\n*ВОЗНИКЛИ ПРОБЛЕМЫ С САЙТОМ. ПОПРОБУЙТЕ СНАЧАЛА*',
+
+    SUCCESSFULLY_SAVED = 'ТОВАР УСПЕШНО СОХРАНЕН',
+
+    SAVE_ERROR = 'НЕ УДАЛОСЬ СОХРАНИТЬ ТОВАР! ПОПРОБУЙТЕ ПОЗЖЕ :(',
+
+    ITEM_NOT_FOUND = 'ТОВАР НЕ НАЙДЕН',
+
+    USER_SEARCH_ERROR = 'ВОЗНИКЛИ ПРОБЛЕМЫ С ПОИСКОМ ПОЛЬЗОВАТЕЛЯ. ПОПРОБУЙТЕ ПОЗЖЕ'
 }
 
 export const createItemStockMsg = (item: Item): string => `НАЗВАНИЕ ТОВАРА: *${ item.name! }*\nНАЧАЛЬНАЯ ЦЕНА: *$${ item.initialPrice }*`;
@@ -28,3 +36,6 @@ export const notFoundPriceMessage = ({ name }: Item): string => {
 
 export const fetchPageErrorMessage = (itemName: string): string =>
     `НЕ УДАЛОСЬ ПОЛУЧИТЬ HTML СТРАНИЦУ ТОВАРА: ${itemName}\nПОПРОБУЙТЕ ВЫПОЛНИТЬ ПОИСК ЦЕН ВРУЧНУЮ!`;
+
+export const deleteItemMessage = (itemName: string): string =>
+    `ТОВАР: ${ itemName } БЫЛ УДАЛЕН`;

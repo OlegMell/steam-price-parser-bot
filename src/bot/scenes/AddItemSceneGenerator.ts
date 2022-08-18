@@ -6,6 +6,7 @@ import { ItemModel, UserModel } from '../../db/db.config';
 import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
 import { DOMHelper } from '../../parser/helpers/DOMHelper';
 import { CSS_SELECTORS } from '../../parser/configs';
+import { MESSAGES } from '../messages';
 
 export class AddItemSceneGenerator {
 
@@ -104,7 +105,7 @@ export class AddItemSceneGenerator {
 
         addItemConfirm.enter(async (ctx: any) => {
 
-            await ctx.replyWithMarkdown('*ОЖИДАЙТЕ, ИДЕТ ПОИСК ТОВАРА...*');
+            const waitForSearchMsg = await ctx.replyWithMarkdown('*ОЖИДАЙТЕ, ИДЕТ ПОИСК ТОВАРА...*');
 
             const puppeteerHelper = new PuppeteerHelper();
 
@@ -115,11 +116,13 @@ export class AddItemSceneGenerator {
             const pageContent: string = await puppeteerHelper.getPageContent(CSS_SELECTORS.ITEM_NAME);
 
             if (!pageContent) {
-
-                await ctx.replyWithMarkdown('*ERROR*\n*ВОЗНИКЛИ ПРОБЛЕМЫ С САЙТОМ. ПОПРОБУЙТЕ СНАЧАЛА*', mainKeyboard);
+                await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
+                await ctx.replyWithMarkdown(MESSAGES.FETCH_HTML_ERROR_MD, mainKeyboard);
                 await ctx.scene.enter('addItem');
 
             } else {
+                await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
+
                 const domHelper: DOMHelper = new DOMHelper(pageContent);
 
                 const itemName: string | null = domHelper.getTextFrom(CSS_SELECTORS.ITEM_NAME);
@@ -141,21 +144,19 @@ export class AddItemSceneGenerator {
                 selectorHTML: CSS_SELECTORS.ITEM_PRICE
             });
 
-            const user = await UserModel.findOne({ chatId: ctx.chat.id });
+            const filter = { chatId: ctx.chat.id };
 
-            if (user) {
-                await UserModel.updateOne({
-                    chatId: ctx.chat.id
-                }, {
-                    $addToSet: {
-                        items: [
-                            newItem
-                        ]
-                    }
-                })
-                    .then(() => ctx.replyWithMarkdown('*ТОВАР УСПЕШНО СОХРАНЕН*', mainKeyboard))
-                    .catch(() => ctx.replyWithMarkdown('* НЕ УДАЛОСЬ СОХРАНИТЬ ТОВАР! ПОПРОБУЙТЕ ПОЗЖЕ :( *', mainKeyboard));
-            }
+            const update = {
+                $addToSet: {
+                    items: [
+                        newItem
+                    ]
+                }
+            };
+
+            await UserModel.findOneAndUpdate(filter, update)
+                .then(() => ctx.replyWithMarkdown(`*${MESSAGES.SUCCESSFULLY_SAVED}*`, mainKeyboard))
+                .catch(() => ctx.replyWithMarkdown(`*${MESSAGES.SAVE_ERROR}*`, mainKeyboard));
 
             addItemConfirm.leave();
         });
