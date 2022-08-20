@@ -3,7 +3,7 @@ import { Markup, Scenes } from 'telegraf';
 import { ItemModel, UserModel } from '../../db/db.config';
 import { User } from '../../db/interfaces/user.interface';
 import { createURLButton, mainKeyboard } from '../keyboard';
-import { createItemStockMsg, deleteItemMessage, MESSAGES } from '../messages';
+import { createItemStockMsg, deleteItemMessage, ERRORS, MESSAGES } from '../messages';
 import { Item } from '../../db/interfaces/item.interface';
 import mongoose, { Schema } from 'mongoose';
 
@@ -91,7 +91,7 @@ export class StockSceneGenerator {
                 const currentUser: any = await UserModel.findOne({ chatId: ctx.chat.id });
 
                 if (!currentUser) {
-                    return await ctx.replyWithMarkdown(`*${ MESSAGES.USER_SEARCH_ERROR }*`)
+                    return await ctx.replyWithMarkdown(`*${ ERRORS.USER_SEARCH }*`)
                 }
 
                 this.#msgs = this.#msgs.filter((msg: any) => msg.itemId !== item.id);

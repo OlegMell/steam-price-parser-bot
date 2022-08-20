@@ -6,7 +6,7 @@ import { ItemModel, UserModel } from '../../db/db.config';
 import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
 import { DOMHelper } from '../../parser/helpers/DOMHelper';
 import { CSS_SELECTORS } from '../../parser/configs';
-import { MESSAGES } from '../messages';
+import { ERRORS, MESSAGES } from '../messages';
 
 export class AddItemSceneGenerator {
 
@@ -105,7 +105,7 @@ export class AddItemSceneGenerator {
 
         addItemConfirm.enter(async (ctx: any) => {
 
-            const waitForSearchMsg = await ctx.replyWithMarkdown('*ОЖИДАЙТЕ, ИДЕТ ПОИСК ТОВАРА...*');
+            const waitForSearchMsg = await ctx.replyWithMarkdown(`*${MESSAGES.WAIT_FOR_SEARCHING}*`);
 
             const puppeteerHelper = new PuppeteerHelper();
 
@@ -117,7 +117,7 @@ export class AddItemSceneGenerator {
 
             if (!pageContent) {
                 await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
-                await ctx.replyWithMarkdown(MESSAGES.FETCH_HTML_ERROR_MD, mainKeyboard);
+                await ctx.replyWithMarkdown(ERRORS.FETCH_HTML_MD, mainKeyboard);
                 await ctx.scene.enter('addItem');
 
             } else {
@@ -155,15 +155,15 @@ export class AddItemSceneGenerator {
             };
 
             await UserModel.findOneAndUpdate(filter, update)
-                .then(() => ctx.replyWithMarkdown(`*${MESSAGES.SUCCESSFULLY_SAVED}*`, mainKeyboard))
-                .catch(() => ctx.replyWithMarkdown(`*${MESSAGES.SAVE_ERROR}*`, mainKeyboard));
+                .then(() => ctx.replyWithMarkdown(`*${ MESSAGES.SUCCESSFULLY_SAVED }*`, mainKeyboard))
+                .catch(() => ctx.replyWithMarkdown( `*${ERRORS.SAVE_ERR} * `, mainKeyboard));
 
             addItemConfirm.leave();
         });
 
         addItemConfirm.hears('Нет', async (ctx: any) => {
             this.#createdItemTempl = undefined;
-            await ctx.replyWithMarkdown('*Добавление товара отмененно*', mainKeyboard);
+            await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА ОТМЕНЕННО*', mainKeyboard);
             await addItemConfirm.leave();
         });
 
