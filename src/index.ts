@@ -10,13 +10,14 @@ startParseBot()
 
         const port = +process.env.PORT!;
 
-        // bot.launch({
-        //     webhook: {
-        //         domain: process.env.HEROKU_URL,
-        //         port: port || 5000,
-        //     }
-        // });
-        bot.launch()
+        bot.launch({
+            webhook: {
+                domain: process.env.HEROKU_URL,
+                port: port || 5000,
+            }
+        });
+
+        // bot.launch()
 
         process.once('SIGINT', () => bot.stop('SIGINT'));
         process.once('SIGTERM', () => bot.stop('SIGTERM'));
