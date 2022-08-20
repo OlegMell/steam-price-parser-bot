@@ -9,6 +9,12 @@ import { UserModel } from '../../db/db.config';
 
 export class ShowPricesSceneGenerator {
 
+    readonly #puppeteerHelper;
+
+    constructor() {
+        this.#puppeteerHelper = new PuppeteerHelper();
+    }
+
     showPricesScene() {
 
         const showPrices = new Scenes.BaseScene<Scenes.SceneContext>('showPrices');
@@ -21,9 +27,9 @@ export class ShowPricesSceneGenerator {
 
             const waitForSearchMsg = await ctx.replyWithMarkdown(`*${MESSAGES.WAIT_FOR_SEARCHING}*`);
 
-            const puppeteerHelper = new PuppeteerHelper();
+            // const puppeteerHelper = new PuppeteerHelper();
 
-            await puppeteerHelper.createBrowserPage();
+            await this.#puppeteerHelper.createBrowserPage();
 
             const user: IUSer | null = await UserModel
                 .findOne({ chatId: ctx.chat.id })
@@ -39,9 +45,11 @@ export class ShowPricesSceneGenerator {
                 return await ctx.replyWithMarkdown(`*${MESSAGES.EMPTY_STOCK}*`)
             }
 
-            await steamParser(ctx, user, puppeteerHelper);
+            await steamParser(ctx, user, this.#puppeteerHelper);
 
             await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
+
+            await this.#puppeteerHelper.close();
 
         });
 
