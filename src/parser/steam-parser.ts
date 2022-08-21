@@ -5,19 +5,42 @@ import { DOMHelper } from './helpers/DOMHelper';
 import { helpers } from '../helpers/helpers';
 import { PuppeteerHelper } from './helpers/PuppeteerHelper';
 
+
+/**
+ * Парсинг сайта Steam по товарам для поиска текущих цен
+ */
 export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: PuppeteerHelper) => {
 
     const messages: string[] = [];
 
+    const RETRY_LIMIT: number = 3;
+
     for (const userItem of user.items!) {
 
-        await puppeteerHelper.goTo(userItem.link);
+        let pageContent: string = '';
 
-        const pageContent: string = await puppeteerHelper.getPageContent(userItem.selectorHTML);
+        let tryCounter: number = 0;
+
+        // Три попытки на запрос к Стиму. Если за три попытки не получили контент - отправим сообщение об этом юзеру
+        do {
+            // await bot.telegram.sendMessage(user.chatId, `ПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`);
+            await puppeteerHelper.goTo(userItem.link);
+            pageContent = await puppeteerHelper.getPageContent(userItem.selectorHTML);
+
+            if (pageContent) {
+                break;
+            }
+
+            tryCounter++;
+
+        } while (tryCounter < RETRY_LIMIT);
+
 
         if (!pageContent) {
 
-            await sendMessage(bot, user.chatId, fetchPageErrorMessage(userItem.name));
+            // await sendMessage(bot, user.chatId, fetchPageErrorMessage(userItem.name));
+
+            messages.push(fetchPageErrorMessage(userItem.name));
 
         } else {
 
