@@ -1,7 +1,7 @@
-import { PuppeteerHelper } from './helpers/PuppeteerHelper';
 import { steamParser } from './steam-parser';
-import { User as IUSer } from '../db/interfaces/user.interface';
 import { User } from '../db/models/user.model';
+import { PuppeteerHelper } from './helpers/PuppeteerHelper';
+import { User as IUSer } from '../db/interfaces/user.interface';
 
 
 export const startParseSchedule = (bot: any, puppeteerHelper: PuppeteerHelper, interval: number): NodeJS.Timer => {

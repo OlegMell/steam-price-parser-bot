@@ -1,9 +1,9 @@
 import { Telegraf } from 'telegraf';
 
+import { Intervals } from './configs';
 import startDBConnect from '../db/db.connect';
 import { PuppeteerHelper } from './helpers/PuppeteerHelper';
 import { startParseSchedule } from './startParseSchedule';
-import { Intervals } from './configs';
 
 
 (async () => {

@@ -1,9 +1,9 @@
-import { User as IUSer } from '../db/interfaces/user.interface';
-import { sendMessage } from '../bot/helpers';
-import { fetchPageErrorMessage, notFoundPriceMessage, priceMessage } from '../bot/messages';
-import { DOMHelper } from './helpers/DOMHelper';
 import { helpers } from '../helpers/helpers';
+import { sendMessage } from '../bot/helpers';
+import { DOMHelper } from './helpers/DOMHelper';
 import { PuppeteerHelper } from './helpers/PuppeteerHelper';
+import { User as IUSer } from '../db/interfaces/user.interface';
+import { fetchPageErrorMessage, notFoundPriceMessage, priceMessage } from '../bot/consts';
 
 
 /**

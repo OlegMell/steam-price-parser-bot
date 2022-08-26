@@ -1,11 +1,11 @@
 import { Telegraf, Scenes, session } from 'telegraf';
 
+import { COMMON_MESSAGES } from './consts';
+import { setStageScenes } from './stage';
+import { mainKeyboard } from './keyboard.js';
 import startDBConnect from '../db/db.connect.js';
 import { User } from '../db/models/user.model.js';
-import { MESSAGES } from './messages.js';
-import { mainKeyboard } from './keyboard.js';
 import { startMainKeyboardListener } from './mainKeyboardListener.js';
-import { setStageScenes } from './stage';
 
 
 
@@ -30,12 +30,12 @@ export default async function startParseBot(): Promise<Telegraf<Scenes.SceneCont
 
             await User.create(ctx);
 
-            await ctx.reply(MESSAGES.HELLO + ctx.chat.first_name);
+            await ctx.reply(COMMON_MESSAGES.HELLO + ctx.chat.first_name);
 
-            await ctx.reply(MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
+            await ctx.reply(COMMON_MESSAGES.NEW_USER_DESCRIPTION, mainKeyboard);
 
         } else {
-            await ctx.reply(MESSAGES.HELLO + ctx.chat.first_name, mainKeyboard);
+            await ctx.reply(COMMON_MESSAGES.HELLO + ctx.chat.first_name, mainKeyboard);
         }
 
     });

@@ -2,7 +2,7 @@ import { ItemModel, UserModel } from '../../db/db.config';
 import { Markup, Scenes } from 'telegraf';
 import { mainKeyboard } from '../keyboard';
 import { Item } from '../../db/interfaces/item.interface';
-import { MESSAGES } from '../messages';
+import { COMMON_MESSAGES } from '../consts';
 
 export class DeleteItemSceneGenerator {
 
@@ -30,7 +30,7 @@ export class DeleteItemSceneGenerator {
 
             if (!item) {
 
-                await ctx.replyWithMarkdown(`*${MESSAGES.ITEM_NOT_FOUND}:* ${itemName} `);
+                await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.ITEM_NOT_FOUND}:* ${itemName} `);
                 await ctx.scene.reenter();
 
             } else {

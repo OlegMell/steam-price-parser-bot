@@ -1,12 +1,11 @@
-import { BUTTON_TEXT } from './buttonText';
-import { MESSAGES } from './messages';
+import { BUTTON_TEXT, COMMON_MESSAGES } from './consts';
 
 
 export const startMainKeyboardListener = (bot: any) => {
 
     bot.hears(BUTTON_TEXT.ADD_ITEM, async (ctx: any) => {
 
-        await bot.telegram.sendMessage(ctx.chat.id, MESSAGES.ADD_ITEM, {
+        await bot.telegram.sendMessage(ctx.chat.id, COMMON_MESSAGES.ADD_ITEM, {
             reply_markup: {
                 remove_keyboard: true
             }
@@ -26,7 +25,7 @@ export const startMainKeyboardListener = (bot: any) => {
     });
 
     bot.hears(BUTTON_TEXT.STOCK, async (ctx: any) => {
-        await ctx.replyWithMarkdown(`*${ MESSAGES.STOCK }*`);
+        await ctx.replyWithMarkdown(`*${ COMMON_MESSAGES.STOCK }*`);
         await ctx.scene.enter('showStock');
     });
 

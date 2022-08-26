@@ -2,10 +2,16 @@ import { Markup, Scenes } from 'telegraf';
 
 import { ItemModel, UserModel } from '../../db/db.config';
 import { User } from '../../db/interfaces/user.interface';
-import { createURLButton, mainKeyboard } from '../keyboard';
-import { createItemStockMsg, deleteItemMessage, ERRORS, MESSAGES } from '../messages';
 import { Item } from '../../db/interfaces/item.interface';
-import mongoose, { Schema } from 'mongoose';
+import { createURLButton, mainKeyboard } from '../keyboard';
+import {
+    createItemStockMsg,
+    deleteItemMessage,
+    ERRORS,
+    COMMON_MESSAGES,
+    BUTTON_TEXT,
+    STOCK_SCENE_MESSAGES
+} from '../consts';
 
 
 export class StockSceneGenerator {
@@ -27,8 +33,8 @@ export class StockSceneGenerator {
                     path: 'items',
                 }).exec();
 
-            await ctx.replyWithMarkdown('*Ваш инвентарь:*', Markup.keyboard([
-                [ 'Назад' ]
+            await ctx.replyWithMarkdown(`*${STOCK_SCENE_MESSAGES.UR_STOCK}*`, Markup.keyboard([
+                [ BUTTON_TEXT.RETURN ]
             ]).resize());
 
             if (userItems && userItems.items && userItems.items.length) {
@@ -45,8 +51,8 @@ export class StockSceneGenerator {
                         createItemStockMsg(items[i]),
 
                         Markup.inlineKeyboard([
-                            createURLButton('Перейти на сайт', items[i].link),
-                            Markup.button.callback('Удалить', items[i].id!),
+                            createURLButton(BUTTON_TEXT.GOTO_SITE, items[i].link),
+                            Markup.button.callback(BUTTON_TEXT.REMOVE, items[i].id!),
                         ])
                     );
 
@@ -57,11 +63,11 @@ export class StockSceneGenerator {
                 }
 
             } else {
-                await ctx.replyWithMarkdown('*ПУСТО! ВЫ ЕЩЁ НИЧЕГО НЕ ДОБАВИЛИ!*');
+                await ctx.replyWithMarkdown(`*${STOCK_SCENE_MESSAGES.EMPTY_STOCK2}*`);
             }
         });
 
-        showStock.hears('Назад', async (ctx: any) => {
+        showStock.hears(BUTTON_TEXT.RETURN, async (ctx: any) => {
 
             for (const item of this.#msgs) {
                 await ctx.telegram.deleteMessage(ctx.chat.id, item.msgId);
@@ -70,7 +76,9 @@ export class StockSceneGenerator {
             this.#userItems = [];
 
             await ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
-            await ctx.replyWithMarkdown('*Вы покинули инвентарь*', mainKeyboard);
+
+            await ctx.replyWithMarkdown(`*${STOCK_SCENE_MESSAGES.U_LEAVE}*`, mainKeyboard);
+
             await ctx.scene.leave();
         });
 

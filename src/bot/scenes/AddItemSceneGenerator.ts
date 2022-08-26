@@ -1,12 +1,14 @@
 import { Context, Scenes } from 'telegraf';
-import { helpers } from '../../helpers/helpers';
 import { Update } from 'telegraf/typings/core/types/typegram';
-import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
-import { ItemModel, UserModel } from '../../db/db.config';
-import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
-import { DOMHelper } from '../../parser/helpers/DOMHelper';
+
+import { helpers } from '../../helpers/helpers';
 import { CSS_SELECTORS } from '../../parser/configs';
-import { ERRORS, MESSAGES } from '../messages';
+import { ItemModel, UserModel } from '../../db/db.config';
+import { DOMHelper } from '../../parser/helpers/DOMHelper';
+import { BUTTON_TEXT, ERRORS, COMMON_MESSAGES } from '../consts';
+import { addItemConfirmKeyboard, mainKeyboard } from '../keyboard';
+import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
+
 
 export class AddItemSceneGenerator {
 
@@ -39,7 +41,7 @@ export class AddItemSceneGenerator {
         addItem.enter(async (ctx: any) => {
             this.#createdItemTempl = {} as { name: string, link: string, initialPrice: number, selectorHTML: string };
 
-            await ctx.reply('Введите ссылку на товар:');
+            await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.ENTER_LINK}*`);
         });
 
         addItem.on('text', async (ctx: any) => {
@@ -47,7 +49,7 @@ export class AddItemSceneGenerator {
             const link: string = ctx.message.text;
 
             if (!helpers.validateLink(link)) {
-                await ctx.reply('Вы ввели не действительную ссылку!');
+                await ctx.replyWithMarkdown(`*${ERRORS.WRONG_LINK}*`);
                 await ctx.scene.reenter();
             } else {
                 this.#createdItemTempl!.link = link;
@@ -62,7 +64,7 @@ export class AddItemSceneGenerator {
         const addItemPrice = new Scenes.BaseScene<Scenes.SceneContext>('addItemPrice');
 
         addItemPrice.enter(async (ctx: any) => {
-            await ctx.reply('Введите начальную цену: ');
+            await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.ENTER_INITIAL_PRICE}*`);
         });
 
         addItemPrice.on('text', async (ctx: any) => {
@@ -105,7 +107,7 @@ export class AddItemSceneGenerator {
 
         addItemConfirm.enter(async (ctx: any) => {
 
-            const waitForSearchMsg = await ctx.replyWithMarkdown(`*${MESSAGES.WAIT_FOR_SEARCHING}*`);
+            const waitForSearchMsg = await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.WAIT_FOR_SEARCHING}*`);
 
             const puppeteerHelper = new PuppeteerHelper();
 
@@ -127,17 +129,17 @@ export class AddItemSceneGenerator {
 
                 const itemName: string | null = domHelper.getTextFrom(CSS_SELECTORS.ITEM_NAME);
 
-                this.#createdItemTempl!.name = itemName || 'НАЗВАНИЕ НЕ НАЙДЕНО';
+                this.#createdItemTempl!.name = itemName || ERRORS.ITEM_NAME_NOT_FOUND;
 
-                await ctx.replyWithMarkdown('*ВЫ ДОБАВЛЯЕТЕ:*');
+                await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.U_ADDING}*`);
 
-                await ctx.replyWithMarkdown(`Название товара: *${ this.#createdItemTempl!.name }*\nНачальная цена: *$${ this.#createdItemTempl!.initialPrice }*\nСсылка: ${ this.#createdItemTempl!.link }`)
+                await ctx.replyWithMarkdown(`*${ this.#createdItemTempl!.name }*\nНАЧАЛЬНАЯ ЦЕНА: *$${ this.#createdItemTempl!.initialPrice }*`)
 
-                await ctx.replyWithMarkdown('*СОХРАНИТЬ ТОВАР?*', addItemConfirmKeyboard);
+                await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.SAVE_ITEM}?*`, addItemConfirmKeyboard);
             }
         });
 
-        addItemConfirm.hears('Да', async (ctx: any) => {
+        addItemConfirm.hears(BUTTON_TEXT.YEP, async (ctx: any) => {
 
             const newItem = await ItemModel.create({
                 ...this.#createdItemTempl,
@@ -155,15 +157,15 @@ export class AddItemSceneGenerator {
             };
 
             await UserModel.findOneAndUpdate(filter, update)
-                .then(() => ctx.replyWithMarkdown(`*${ MESSAGES.SUCCESSFULLY_SAVED }*`, mainKeyboard))
+                .then(() => ctx.replyWithMarkdown(`*${ COMMON_MESSAGES.SUCCESSFULLY_SAVED }*`, mainKeyboard))
                 .catch(() => ctx.replyWithMarkdown( `*${ERRORS.SAVE_ERR} * `, mainKeyboard));
 
             addItemConfirm.leave();
         });
 
-        addItemConfirm.hears('Нет', async (ctx: any) => {
+        addItemConfirm.hears(BUTTON_TEXT.NOP, async (ctx: any) => {
             this.#createdItemTempl = undefined;
-            await ctx.replyWithMarkdown('*ДОБАВЛЕНИЕ ТОВАРА ОТМЕНЕННО*', mainKeyboard);
+            await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.ADDING_CANCELED}*`, mainKeyboard);
             await addItemConfirm.leave();
         });
 

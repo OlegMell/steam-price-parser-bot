@@ -1,11 +1,12 @@
 import { Markup, Scenes } from 'telegraf';
 
-import { ERRORS, MESSAGES } from '../messages';
 import { mainKeyboard } from '../keyboard';
-import { steamParser } from '../../parser/steam-parser';
-import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
-import { User as IUSer } from '../../db/interfaces/user.interface';
 import { UserModel } from '../../db/db.config';
+import { steamParser } from '../../parser/steam-parser';
+import { User as IUSer } from '../../db/interfaces/user.interface';
+import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
+import { ERRORS, COMMON_MESSAGES, SHOW_PRICE_SCENE_MESSAGES, BUTTON_TEXT, STOCK_SCENE_MESSAGES } from '../consts';
+
 
 export class ShowPricesSceneGenerator {
 
@@ -21,13 +22,11 @@ export class ShowPricesSceneGenerator {
 
         showPrices.enter(async (ctx: any) => {
 
-            await ctx.replyWithMarkdown(`*${ MESSAGES.SHOW_PRICES }*`, Markup.keyboard([
-                [ 'Назад' ]
+            await ctx.replyWithMarkdown(`*${ SHOW_PRICE_SCENE_MESSAGES.SHOW_PRICES }*`, Markup.keyboard([
+                [ BUTTON_TEXT.RETURN ]
             ]).resize());
 
-            const waitForSearchMsg = await ctx.replyWithMarkdown(`*${MESSAGES.WAIT_FOR_SEARCHING}*`);
-
-            // const puppeteerHelper = new PuppeteerHelper();
+            const waitForSearchMsg = await ctx.replyWithMarkdown(`*${COMMON_MESSAGES.WAIT_FOR_SEARCHING}*`);
 
             await this.#puppeteerHelper.createBrowserPage();
 
@@ -42,7 +41,7 @@ export class ShowPricesSceneGenerator {
                 return await ctx.replyWithMarkdown(`*${ERRORS.USER_NOT_FOUND}*`);
             } else if (user && (!user.items || !user.items.length)) {
                 await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
-                return await ctx.replyWithMarkdown(`*${MESSAGES.EMPTY_STOCK}*`)
+                return await ctx.replyWithMarkdown(`*${STOCK_SCENE_MESSAGES.EMPTY_STOCK}*`)
             }
 
             await steamParser(ctx, user, this.#puppeteerHelper);
@@ -53,9 +52,9 @@ export class ShowPricesSceneGenerator {
 
         });
 
-        showPrices.hears('Назад', async (ctx: any) => {
+        showPrices.hears(BUTTON_TEXT.RETURN, async (ctx: any) => {
             await ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
-            await ctx.replyWithMarkdown('*ВЫ ВЫШЛИ ИЗ ПРОСМОТРА ЦЕН*', mainKeyboard);
+            await ctx.replyWithMarkdown(`*${SHOW_PRICE_SCENE_MESSAGES.U_LEAVE}*`, mainKeyboard);
             await ctx.scene.leave();
         });
 
