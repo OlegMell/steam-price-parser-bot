@@ -30,6 +30,14 @@ export class ShowPricesSceneGenerator {
 
             await this.#puppeteerHelper.createBrowserPage();
 
+            // this.#puppeteerHelper.createBrowser()
+            // .then(browser => {
+            //     this.#puppeteerHelper.createPage(browser)
+            //     .then(page => {
+            //         this.#puppeteerHelper.page = page;
+            //     });
+            // });
+
             const user: IUSer | null = await UserModel
                 .findOne({ chatId: ctx.chat.id })
                 .populate({

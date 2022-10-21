@@ -24,7 +24,9 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
         // Три попытки на запрос к Стиму. Если за три попытки не получили контент - отправим сообщение об этом юзеру
         do {
             // await bot.telegram.sendMessage(user.chatId, `ПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`);
-            await puppeteerHelper.goTo(userItem.link);
+            await puppeteerHelper.goTo(userItem.link).catch((err) => {
+                console.log(err);
+            });
             pageContent = await puppeteerHelper.getPageContent(userItem.selectorHTML);
 
             if (pageContent) {
@@ -32,6 +34,8 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
             }
 
             tryCounter++;
+
+            console.log('TRY NUMBER: ', tryCounter);
 
         } while (tryCounter < RETRY_LIMIT);
 

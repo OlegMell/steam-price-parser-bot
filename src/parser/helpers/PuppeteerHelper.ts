@@ -9,17 +9,19 @@ import puppeteer, {
 
 export class PuppeteerHelper {
 
-    #browser: Browser;
+    browser: Browser;
 
-    #page: Page;
+    page: Page;
 
     readonly #options: PuppeteerLaunchOptions = {
         headless: true,
-        args: [ '--no-sandbox' ]
+        args: [ '--no-sandbox' ],
+        timeout: 10000
     };
 
     #goToOptions: WaitForOptions = {
-        waitUntil: 'networkidle2'
+        waitUntil: 'networkidle2',
+        timeout: 10000
     };
 
     constructor(options?: PuppeteerLaunchOptions) {
@@ -30,25 +32,29 @@ export class PuppeteerHelper {
 
     }
 
-    get browser() {
-        return this.#browser;
+    async createBrowser(): Promise<any> {
+        return puppeteer.launch(this.#options);
     }
 
-    get page() {
-        return this.#page;
+    async createPage(browser: any): Promise<any> {
+        if (browser) {
+            return browser.newPage();
+        } else {
+            return this.browser.newPage();
+        }
     }
 
     async createBrowserPage() {
-        this.#browser = await puppeteer.launch(this.#options);
-        this.#page = await this.#browser.newPage();
+        this.browser = await puppeteer.launch(this.#options);
+        this.page = await this.browser.newPage();
     }
 
     async goTo(link: string, options?: WaitForOptions & { referer?: string | undefined }): Promise<HTTPResponse | null> {
-        return this.#page.goto(link, { ...this.#goToOptions });
+        return this.page.goto(link, { ...this.#goToOptions });
     }
 
     async waitForSelector(selector: string): Promise<ElementHandle<NodeFor<string>> | null> {
-        return this.#page.waitForSelector(selector, {
+        return this.page.waitForSelector(selector, {
             timeout: 50000
         });
     }
@@ -57,7 +63,7 @@ export class PuppeteerHelper {
 
         return this.waitForSelector(selector)
             .then(() => {
-                return this.#page.content();
+                return this.page.content();
             })
             .catch(() => {
                 return '';
@@ -65,7 +71,7 @@ export class PuppeteerHelper {
     }
 
     async close(): Promise<void> {
-        return this.#browser.close();
+        return this.browser.close();
     }
 
 }

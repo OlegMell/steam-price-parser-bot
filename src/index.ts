@@ -12,12 +12,12 @@ startParseBot()
 
         if (process.env.NODE_ENV === 'production') {
 
-            bot.launch({
-                webhook: {
-                    domain: process.env.HEROKU_URL,
-                    port: port || 5000,
-                }
-            });
+            // bot.launch({
+            //     webhook: {
+            //         domain: process.env.HEROKU_URL,
+            //         port: port || 5000,
+            //     }
+            // });
 
         } else if (process.env.NODE_ENV === 'development') {
             bot.launch();

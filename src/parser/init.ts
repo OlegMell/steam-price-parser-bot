@@ -14,7 +14,7 @@ import { startParseSchedule } from './startParseSchedule';
 
     const puppeteerHelper = new PuppeteerHelper();
 
-    const intervalId = startParseSchedule(bot, puppeteerHelper, Intervals.HOUR6);
+    const intervalId = startParseSchedule(bot, puppeteerHelper, Intervals.HOUR3);
 
     process.once('SIGINT', () => {
         bot.stop('SIGINT');
