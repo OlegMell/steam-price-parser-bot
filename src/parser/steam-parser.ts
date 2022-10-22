@@ -15,18 +15,25 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
 
     const RETRY_LIMIT: number = 3;
 
+    let tmpMessages: any[] = [];
+
     for (const userItem of user.items!) {
 
         let pageContent: string = '';
 
-        let tryCounter: number = 0;
+        let tryCounter: number = 1;
 
         // Три попытки на запрос к Стиму. Если за три попытки не получили контент - отправим сообщение об этом юзеру
         do {
-            // await bot.telegram.sendMessage(user.chatId, `ПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`);
+
+            tmpMessages.push(
+                await bot.telegram.sendMessage(user.chatId, `ПОИСК ТОВАРА: ${userItem.name}\nПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`)
+            );
+
             await puppeteerHelper.goTo(userItem.link).catch((err) => {
                 console.log(err);
             });
+
             pageContent = await puppeteerHelper.getPageContent(userItem.selectorHTML);
 
             if (pageContent) {
@@ -37,7 +44,7 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
 
             console.log('TRY NUMBER: ', tryCounter);
 
-        } while (tryCounter < RETRY_LIMIT);
+        } while (tryCounter <= RETRY_LIMIT);
 
 
         if (!pageContent) {
@@ -65,6 +72,13 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
     }
 
     const collectedPriceMessage = messages.join('\n\n');
+
+    // удаление сообщений о попытках поиска товаров
+    for await (const msg of tmpMessages) {
+        bot.telegram.deleteMessage(user.chatId, msg.message_id);
+    }
+
+    tmpMessages = [];
 
     await sendMessage(bot, user.chatId, collectedPriceMessage);
 }

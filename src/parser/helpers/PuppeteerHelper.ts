@@ -55,7 +55,7 @@ export class PuppeteerHelper {
 
     async waitForSelector(selector: string): Promise<ElementHandle<NodeFor<string>> | null> {
         return this.page.waitForSelector(selector, {
-            timeout: 50000
+            timeout: 30000
         });
     }
 
