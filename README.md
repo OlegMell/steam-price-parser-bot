@@ -28,7 +28,8 @@ Just add item by link and click button or wait for 6 hours interval for get pric
 
 ***
 
-**`npm run start`**  - start the app
+**`npm run dev`**  - start the bot
+**`npm run work`** - start automatical price parsing mode
 
 
 
