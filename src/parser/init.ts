@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import { Telegraf } from 'telegraf';
 
 import { Intervals } from './configs';
@@ -17,12 +21,16 @@ import { startParseSchedule } from './startParseSchedule';
     const intervalId = startParseSchedule(bot, puppeteerHelper, Intervals.HOUR3);
 
     process.once('SIGINT', () => {
+        console.log('SIGINT');
+
         bot.stop('SIGINT');
         clearInterval(intervalId);
         puppeteerHelper.close();
     });
 
     process.once('SIGTERM', () => {
+        console.log('SIGTERM');
+
         bot.stop('SIGTERM');
         clearInterval(intervalId);
         puppeteerHelper.close();
