@@ -4,12 +4,13 @@ import { DOMHelper } from './helpers/DOMHelper';
 import { PuppeteerHelper } from './helpers/PuppeteerHelper';
 import { User as IUSer } from '../db/interfaces/user.interface';
 import { fetchPageErrorMessage, notFoundPriceMessage, priceMessage } from '../bot/consts';
+import { PARSE_MODE, PARSE_MODE_UNION } from './configs';
 
 
 /**
  * Парсинг сайта Steam по товарам для поиска текущих цен
  */
-export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: PuppeteerHelper) => {
+export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: PuppeteerHelper, parseMode: PARSE_MODE_UNION = PARSE_MODE.AUTO) => {
 
     const messages: string[] = [];
 
@@ -26,9 +27,11 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
         // Три попытки на запрос к Стиму. Если за три попытки не получили контент - отправим сообщение об этом юзеру
         do {
 
-            tmpMessages.push(
-                await bot.telegram.sendMessage(user.chatId, `ПОИСК ТОВАРА: ${userItem.name}\nПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`)
-            );
+            if (parseMode === PARSE_MODE.MANUAL) {
+                tmpMessages.push(
+                    await bot.telegram.sendMessage(user.chatId, `ПОИСК ТОВАРА: ${userItem.name}\nПОПЫТКА ${tryCounter} / ${RETRY_LIMIT}`)
+                );
+            }
 
             await puppeteerHelper.goTo(userItem.link).catch((err) => {
                 console.log(err);
@@ -48,11 +51,7 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
 
 
         if (!pageContent) {
-
-            // await sendMessage(bot, user.chatId, fetchPageErrorMessage(userItem.name));
-
             messages.push(fetchPageErrorMessage(userItem.name));
-
         } else {
 
             const domHelper: DOMHelper = new DOMHelper(pageContent);
@@ -73,12 +72,17 @@ export const steamParser = async (bot: any, user: IUSer, puppeteerHelper: Puppet
 
     const collectedPriceMessage = messages.join('\n\n');
 
+
     // удаление сообщений о попытках поиска товаров
-    for await (const msg of tmpMessages) {
-        bot.telegram.deleteMessage(user.chatId, msg.message_id);
+    if (parseMode === PARSE_MODE.MANUAL) {
+
+        for await (const msg of tmpMessages) {
+            bot.telegram.deleteMessage(user.chatId, msg.message_id);
+        }
+
+        tmpMessages = [];
     }
 
-    tmpMessages = [];
 
     await sendMessage(bot, user.chatId, collectedPriceMessage);
 }

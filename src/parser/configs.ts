@@ -16,3 +16,10 @@ export enum CSS_SELECTORS {
     ITEM_NAME = 'h1#largeiteminfo_item_name',
     ITEM_PRICE = 'span.market_commodity_orders_header_promote',
 }
+
+export enum PARSE_MODE {
+    MANUAL = 'manual',
+    AUTO = 'auto',
+}
+
+export type PARSE_MODE_UNION = `${PARSE_MODE}`;

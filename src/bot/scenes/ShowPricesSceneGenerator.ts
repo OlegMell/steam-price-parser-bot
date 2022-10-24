@@ -6,6 +6,7 @@ import { steamParser } from '../../parser/steam-parser';
 import { User as IUSer } from '../../db/interfaces/user.interface';
 import { PuppeteerHelper } from '../../parser/helpers/PuppeteerHelper';
 import { ERRORS, COMMON_MESSAGES, SHOW_PRICE_SCENE_MESSAGES, BUTTON_TEXT, STOCK_SCENE_MESSAGES } from '../consts';
+import { PARSE_MODE } from '../../parser/configs';
 
 
 export class ShowPricesSceneGenerator {
@@ -30,14 +31,6 @@ export class ShowPricesSceneGenerator {
 
             await this.#puppeteerHelper.createBrowserPage();
 
-            // this.#puppeteerHelper.createBrowser()
-            // .then(browser => {
-            //     this.#puppeteerHelper.createPage(browser)
-            //     .then(page => {
-            //         this.#puppeteerHelper.page = page;
-            //     });
-            // });
-
             const user: IUSer | null = await UserModel
                 .findOne({ chatId: ctx.chat.id })
                 .populate({
@@ -52,7 +45,7 @@ export class ShowPricesSceneGenerator {
                 return await ctx.replyWithMarkdown(`*${STOCK_SCENE_MESSAGES.EMPTY_STOCK}*`)
             }
 
-            await steamParser(ctx, user, this.#puppeteerHelper);
+            await steamParser(ctx, user, this.#puppeteerHelper, PARSE_MODE.MANUAL);
 
             await ctx.telegram.deleteMessage(ctx.chat.id, waitForSearchMsg.message_id);
 
